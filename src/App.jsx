@@ -114,8 +114,12 @@ const generateHistory = (base, vol, days, trend = 0) => {
   return data;
 };
 
-// Indices
-const INDICES = {
+// ============================================================================
+// INITIAL DATA (Used as baseline for state)
+// ============================================================================
+
+// Indices - Initial Values
+const INITIAL_INDICES = {
   SPX: {
     name: 'S&P 500',
     price: 5234.18,
@@ -188,8 +192,8 @@ const INDICES = {
   },
 };
 
-// Forex
-const FOREX = {
+// Forex - Initial Values
+const INITIAL_FOREX = {
   EURUSD: {
     name: 'EUR/USD',
     price: 1.0847,
@@ -626,8 +630,8 @@ const CENTRAL_BANKS = {
   },
 };
 
-// Crypto
-const CRYPTO = {
+// Crypto - Initial Values
+const INITIAL_CRYPTO = {
   BTCUSD: {
     name: 'Bitcoin',
     price: 67432.18,
@@ -658,8 +662,8 @@ const CRYPTO = {
   },
 };
 
-// Commodities
-const COMMODITIES = {
+// Commodities - Initial Values
+const INITIAL_COMMODITIES = {
   XAUUSD: {
     name: 'Gold',
     price: 2342.8,
@@ -697,8 +701,8 @@ const COMMODITIES = {
   },
 };
 
-// Stocks for M&A Research
-const STOCKS = {
+// Stocks for M&A Research - Initial Values
+const INITIAL_STOCKS = {
   AAPL: {
     name: 'Apple Inc.',
     price: 189.84,
@@ -1629,6 +1633,154 @@ export default function IgeaOmnisPro() {
   const [searchQuery, setSearchQuery] = useState('');
   const [zoomLevel, setZoomLevel] = useState(100);
   const [autoRefresh, setAutoRefresh] = useState(false);
+
+  // ============================================================================
+  // DYNAMIC MARKET DATA STATE
+  // ============================================================================
+  const [indices, setIndices] = useState(INITIAL_INDICES);
+  const [forex, setForex] = useState(INITIAL_FOREX);
+  const [crypto, setCrypto] = useState(INITIAL_CRYPTO);
+  const [commodities, setCommodities] = useState(INITIAL_COMMODITIES);
+  const [stocks, setStocks] = useState(INITIAL_STOCKS);
+  const [liveMode, setLiveMode] = useState(true); // Enable simulated live updates
+
+  // Backwards compatibility - create const references
+  const INDICES = indices;
+  const FOREX = forex;
+  const CRYPTO = crypto;
+  const COMMODITIES = commodities;
+  const STOCKS = stocks;
+
+  // ============================================================================
+  // API INTEGRATION PLACEHOLDER
+  // ============================================================================
+  const fetchMarketData = async () => {
+    // TODO: Replace with actual API calls
+    // Example structure for future implementation:
+    /*
+    try {
+      const response = await fetch('YOUR_API_ENDPOINT');
+      const data = await response.json();
+      
+      setIndices(data.indices);
+      setForex(data.forex);
+      setCrypto(data.crypto);
+      setCommodities(data.commodities);
+      setStocks(data.stocks);
+    } catch (error) {
+      console.error('Error fetching market data:', error);
+    }
+    */
+    console.log('fetchMarketData: Ready for API integration');
+  };
+
+  // ============================================================================
+  // SIMULATED LIVE UPDATES (3-second interval)
+  // ============================================================================
+  useEffect(() => {
+    if (!liveMode) return;
+
+    const simulateLiveUpdate = () => {
+      // Update INDICES
+      setIndices(prev => {
+        const updated = {};
+        Object.keys(prev).forEach(key => {
+          const asset = prev[key];
+          const priceVariation = (Math.random() - 0.5) * 0.02; // ±1% max variation
+          const newPrice = asset.price * (1 + priceVariation);
+          const newChange = asset.change + (Math.random() - 0.5) * 0.2; // Slight change variation
+          
+          updated[key] = {
+            ...asset,
+            price: Math.round(newPrice * 100) / 100,
+            change: Math.round(newChange * 100) / 100,
+          };
+        });
+        return updated;
+      });
+
+      // Update FOREX
+      setForex(prev => {
+        const updated = {};
+        Object.keys(prev).forEach(key => {
+          const asset = prev[key];
+          const priceVariation = (Math.random() - 0.5) * 0.005; // ±0.25% max variation
+          const newPrice = asset.price * (1 + priceVariation);
+          const newChange = asset.change + (Math.random() - 0.5) * 0.1;
+          
+          updated[key] = {
+            ...asset,
+            price: Math.round(newPrice * 10000) / 10000,
+            change: Math.round(newChange * 100) / 100,
+            bid: Math.round((newPrice - 0.0002) * 10000) / 10000,
+            ask: Math.round((newPrice + 0.0002) * 10000) / 10000,
+          };
+        });
+        return updated;
+      });
+
+      // Update CRYPTO
+      setCrypto(prev => {
+        const updated = {};
+        Object.keys(prev).forEach(key => {
+          const asset = prev[key];
+          const priceVariation = (Math.random() - 0.5) * 0.03; // ±1.5% max variation
+          const newPrice = asset.price * (1 + priceVariation);
+          const newChange = asset.change + (Math.random() - 0.5) * 0.3;
+          
+          updated[key] = {
+            ...asset,
+            price: Math.round(newPrice * 100) / 100,
+            change: Math.round(newChange * 100) / 100,
+          };
+        });
+        return updated;
+      });
+
+      // Update COMMODITIES
+      setCommodities(prev => {
+        const updated = {};
+        Object.keys(prev).forEach(key => {
+          const asset = prev[key];
+          const priceVariation = (Math.random() - 0.5) * 0.015; // ±0.75% max variation
+          const newPrice = asset.price * (1 + priceVariation);
+          const newChange = asset.change + (Math.random() - 0.5) * 0.15;
+          
+          updated[key] = {
+            ...asset,
+            price: Math.round(newPrice * 100) / 100,
+            change: Math.round(newChange * 100) / 100,
+          };
+        });
+        return updated;
+      });
+
+      // Update STOCKS
+      setStocks(prev => {
+        const updated = {};
+        Object.keys(prev).forEach(key => {
+          const asset = prev[key];
+          const priceVariation = (Math.random() - 0.5) * 0.02; // ±1% max variation
+          const newPrice = asset.price * (1 + priceVariation);
+          const newChange = asset.change + (Math.random() - 0.5) * 0.2;
+          
+          updated[key] = {
+            ...asset,
+            price: Math.round(newPrice * 100) / 100,
+            change: Math.round(newChange * 100) / 100,
+          };
+        });
+        return updated;
+      });
+
+      console.log('Live prices updated');
+    };
+
+    // Update every 3 seconds
+    const interval = setInterval(simulateLiveUpdate, 3000);
+    
+    return () => clearInterval(interval);
+  }, [liveMode]);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
