@@ -318,6 +318,98 @@ const FOREX = {
   },
 };
 
+// Central Banks Data
+const CENTRAL_BANKS = {
+  FED: {
+    name: 'Federal Reserve (USA)',
+    rate: 5.50,
+    change: 0.00,
+    nextMeeting: '2026-03-18',
+    stance: 'Restrictive',
+    inflation: 2.9,
+    unemployment: 3.7,
+    gdp: 2.4,
+    balanceSheet: 7840,
+  },
+  ECB: {
+    name: 'European Central Bank',
+    rate: 4.50,
+    change: 0.00,
+    nextMeeting: '2026-03-12',
+    stance: 'Restrictive',
+    inflation: 2.4,
+    unemployment: 6.5,
+    gdp: 0.5,
+    balanceSheet: 6920,
+  },
+  BOE: {
+    name: 'Bank of England',
+    rate: 5.25,
+    change: 0.00,
+    nextMeeting: '2026-03-20',
+    stance: 'Restrictive',
+    inflation: 4.0,
+    unemployment: 4.2,
+    gdp: 0.3,
+    balanceSheet: 880,
+  },
+  BOJ: {
+    name: 'Bank of Japan',
+    rate: 0.10,
+    change: 0.00,
+    nextMeeting: '2026-03-19',
+    stance: 'Accommodative',
+    inflation: 2.6,
+    unemployment: 2.5,
+    gdp: 1.2,
+    balanceSheet: 5840,
+  },
+  BOC: {
+    name: 'Bank of Canada',
+    rate: 5.00,
+    change: 0.00,
+    nextMeeting: '2026-03-06',
+    stance: 'Restrictive',
+    inflation: 3.1,
+    unemployment: 5.8,
+    gdp: 1.1,
+    balanceSheet: 280,
+  },
+  RBA: {
+    name: 'Reserve Bank of Australia',
+    rate: 4.35,
+    change: 0.00,
+    nextMeeting: '2026-03-04',
+    stance: 'Restrictive',
+    inflation: 4.1,
+    unemployment: 3.9,
+    gdp: 1.5,
+    balanceSheet: 380,
+  },
+  SNB: {
+    name: 'Swiss National Bank',
+    rate: 1.75,
+    change: 0.00,
+    nextMeeting: '2026-03-21',
+    stance: 'Neutral',
+    inflation: 1.7,
+    unemployment: 2.1,
+    gdp: 1.3,
+    balanceSheet: 720,
+  },
+  PBOC: {
+    name: "People's Bank of China",
+    rate: 3.45,
+    change: 0.00,
+    nextMeeting: '2026-03-15',
+    stance: 'Accommodative',
+    inflation: 0.3,
+    unemployment: 5.2,
+    gdp: 5.2,
+    balanceSheet: 5420,
+  },
+};
+
 // Crypto
 const CRYPTO = {
   BTCUSD: {
@@ -1324,13 +1416,15 @@ export default function IgeaOmnisPro() {
     return () => clearInterval(t);
   }, []);
 
-  // Auto-refresh data every 10 seconds when enabled
+  // Auto-refresh data every 5 seconds when enabled
   useEffect(() => {
     if (!autoRefresh) return;
     const interval = setInterval(() => {
       // Simulate data refresh - in production, this would call APIs
       console.log('Auto-refreshing data...');
-    }, 10000);
+      // Force re-render to simulate data update
+      setTime(new Date());
+    }, 5000);
     return () => clearInterval(interval);
   }, [autoRefresh]);
 
@@ -1512,15 +1606,42 @@ export default function IgeaOmnisPro() {
     { id: 'overview', label: 'OVERVIEW', icon: BarChart3 },
     { id: 'markets', label: 'MARKETS', icon: TrendingUp },
     { id: 'forex', label: 'FOREX', icon: ArrowRightLeft },
+    { id: 'centralbanks', label: 'CENTRAL BANKS', icon: Building2 },
     { id: 'trends', label: 'TRENDS', icon: Search },
     { id: 'predictions', label: 'PREDICTIONS', icon: Target },
     { id: 'compare', label: 'COMPARE', icon: Activity },
-    { id: 'research', label: 'RESEARCH', icon: Building2 },
+    { id: 'research', label: 'RESEARCH', icon: Globe },
     { id: 'news', label: 'NEWS', icon: Newspaper },
     { id: 'reports', label: 'REPORTS', icon: FileText },
   ];
 
   return (
+    <>
+      <style>{`
+        @keyframes tickerScroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        
+        .ticker-wrapper {
+          overflow: hidden;
+          position: relative;
+        }
+        
+        .ticker-content {
+          display: flex;
+          animation: tickerScroll 60s linear infinite;
+          will-change: transform;
+        }
+        
+        .ticker-content:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
     <div
       style={{
         minHeight: '100vh',
@@ -1690,105 +1811,196 @@ export default function IgeaOmnisPro() {
       >
         {/* TICKER BAR */}
         <div
+          className="ticker-wrapper"
           style={{
             background: COLORS.bgPrimary,
             borderBottom: `1px solid ${COLORS.border}`,
-            padding: '5px 16px',
-            display: 'flex',
-            gap: '20px',
-            overflowX: 'auto',
+            padding: '5px 0',
           }}
         >
-        {Object.entries(INDICES)
-          .slice(0, 6)
-          .map(([t, d]) => (
+          <div className="ticker-content" style={{ gap: '20px', padding: '0 16px' }}>
+            {/* First set of tickers */}
+            {Object.entries(INDICES)
+              .slice(0, 6)
+              .map(([t, d]) => (
+                <div
+                  key={`${t}-1`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: COLORS.primary,
+                    }}
+                  >
+                    {t}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '10px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {fmt(d.price, 0)}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      color: d.change >= 0 ? COLORS.positive : COLORS.negative,
+                    }}
+                  >
+                    {fmtChg(d.change)}
+                  </span>
+                </div>
+              ))}
             <div
-              key={t}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "'Consolas', monospace",
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  color: COLORS.primary,
-                }}
-              >
-                {t}
-              </span>
-              <span
-                style={{
-                  fontFamily: "'Consolas', monospace",
-                  fontSize: '10px',
-                  fontWeight: 600,
-                }}
-              >
-                {fmt(d.price, 0)}
-              </span>
-              <span
-                style={{
-                  fontFamily: "'Consolas', monospace",
-                  fontSize: '9px',
-                  fontWeight: 600,
-                  color: d.change >= 0 ? COLORS.positive : COLORS.negative,
-                }}
-              >
-                {fmtChg(d.change)}
-              </span>
-            </div>
-          ))}
-        <div
-          style={{ borderLeft: `1px solid ${COLORS.border}`, margin: '0 4px' }}
-        />
-        {Object.entries(FOREX)
-          .slice(0, 4)
-          .map(([t, d]) => (
+              style={{ borderLeft: `1px solid ${COLORS.border}`, margin: '0 4px', height: '16px' }}
+            />
+            {Object.entries(FOREX)
+              .slice(0, 4)
+              .map(([t, d]) => (
+                <div
+                  key={`${t}-1`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: COLORS.primary,
+                    }}
+                  >
+                    {t}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '10px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {fmt(d.price, 4)}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      color: d.change >= 0 ? COLORS.positive : COLORS.negative,
+                    }}
+                  >
+                    {fmtChg(d.change)}
+                  </span>
+                </div>
+              ))}
+            {/* Duplicate set for seamless loop */}
+            {Object.entries(INDICES)
+              .slice(0, 6)
+              .map(([t, d]) => (
+                <div
+                  key={`${t}-2`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: COLORS.primary,
+                    }}
+                  >
+                    {t}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '10px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {fmt(d.price, 0)}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      color: d.change >= 0 ? COLORS.positive : COLORS.negative,
+                    }}
+                  >
+                    {fmtChg(d.change)}
+                  </span>
+                </div>
+              ))}
             <div
-              key={t}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "'Consolas', monospace",
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  color: COLORS.primary,
-                }}
-              >
-                {t}
-              </span>
-              <span
-                style={{
-                  fontFamily: "'Consolas', monospace",
-                  fontSize: '10px',
-                  fontWeight: 600,
-                }}
-              >
-                {fmt(d.price, 4)}
-              </span>
-              <span
-                style={{
-                  fontFamily: "'Consolas', monospace",
-                  fontSize: '9px',
-                  fontWeight: 600,
-                  color: d.change >= 0 ? COLORS.positive : COLORS.negative,
-                }}
-              >
-                {fmtChg(d.change)}
-              </span>
-            </div>
-          ))}
-      </div>
+              style={{ borderLeft: `1px solid ${COLORS.border}`, margin: '0 4px', height: '16px' }}
+            />
+            {Object.entries(FOREX)
+              .slice(0, 4)
+              .map(([t, d]) => (
+                <div
+                  key={`${t}-2`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: COLORS.primary,
+                    }}
+                  >
+                    {t}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '10px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {fmt(d.price, 4)}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      color: d.change >= 0 ? COLORS.positive : COLORS.negative,
+                    }}
+                  >
+                    {fmtChg(d.change)}
+                  </span>
+                </div>
+              ))}
+          </div>
+        </div>
 
       {/* MAIN */}
       <main
@@ -3250,6 +3462,231 @@ export default function IgeaOmnisPro() {
           </div>
         )}
 
+        {/* ==================== CENTRAL BANKS ==================== */}
+        {tab === 'centralbanks' && (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '12px',
+            }}
+          >
+            <Panel title="Central Banks Overview" noPad>
+              <div
+                style={{
+                  fontSize: '8px',
+                  color: COLORS.textMuted,
+                  padding: '4px 10px',
+                  background: COLORS.bgSecondary,
+                  display: 'grid',
+                  gridTemplateColumns: '50px 1fr 60px 60px 80px',
+                  gap: '4px',
+                }}
+              >
+                <span>CODE</span>
+                <span>BANK</span>
+                <span style={{ textAlign: 'right' }}>RATE</span>
+                <span style={{ textAlign: 'right' }}>CHG</span>
+                <span style={{ textAlign: 'right' }}>STANCE</span>
+              </div>
+              {Object.entries(CENTRAL_BANKS).map(([code, bank]) => (
+                <div
+                  key={code}
+                  style={{
+                    padding: '8px 10px',
+                    borderBottom: `1px solid ${COLORS.border}`,
+                    display: 'grid',
+                    gridTemplateColumns: '50px 1fr 60px 60px 80px',
+                    gap: '4px',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = COLORS.bgSecondary;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '9px',
+                      fontWeight: 700,
+                      color: COLORS.primary,
+                    }}
+                  >
+                    {code}
+                  </span>
+                  <span style={{ fontSize: '9px' }}>{bank.name}</span>
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      textAlign: 'right',
+                    }}
+                  >
+                    {bank.rate.toFixed(2)}%
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Consolas', monospace",
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      textAlign: 'right',
+                      color: bank.change >= 0 ? COLORS.positive : COLORS.negative,
+                    }}
+                  >
+                    {bank.change >= 0 ? '+' : ''}{bank.change.toFixed(2)}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '8px',
+                      textAlign: 'right',
+                      color:
+                        bank.stance === 'Restrictive'
+                          ? COLORS.negative
+                          : bank.stance === 'Accommodative'
+                          ? COLORS.positive
+                          : COLORS.textMuted,
+                    }}
+                  >
+                    {bank.stance}
+                  </span>
+                </div>
+              ))}
+            </Panel>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <Panel title="Key Metrics Comparison">
+                <div
+                  style={{
+                    fontSize: '8px',
+                    color: COLORS.textMuted,
+                    padding: '4px 10px',
+                    background: COLORS.bgSecondary,
+                    display: 'grid',
+                    gridTemplateColumns: '50px 1fr 60px 60px 60px',
+                    gap: '4px',
+                    marginBottom: '4px',
+                  }}
+                >
+                  <span>CODE</span>
+                  <span>BANK</span>
+                  <span style={{ textAlign: 'right' }}>INFLATION</span>
+                  <span style={{ textAlign: 'right' }}>UNEMP</span>
+                  <span style={{ textAlign: 'right' }}>GDP</span>
+                </div>
+                {Object.entries(CENTRAL_BANKS).map(([code, bank]) => (
+                  <div
+                    key={code}
+                    style={{
+                      padding: '6px 10px',
+                      borderBottom: `1px solid ${COLORS.border}`,
+                      display: 'grid',
+                      gridTemplateColumns: '50px 1fr 60px 60px 60px',
+                      gap: '4px',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "'Consolas', monospace",
+                        fontSize: '9px',
+                        fontWeight: 700,
+                        color: COLORS.primary,
+                      }}
+                    >
+                      {code}
+                    </span>
+                    <span style={{ fontSize: '9px' }}>{bank.name}</span>
+                    <span
+                      style={{
+                        fontFamily: "'Consolas', monospace",
+                        fontSize: '9px',
+                        textAlign: 'right',
+                        color: bank.inflation > 2 ? COLORS.negative : COLORS.positive,
+                      }}
+                    >
+                      {bank.inflation.toFixed(1)}%
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "'Consolas', monospace",
+                        fontSize: '9px',
+                        textAlign: 'right',
+                      }}
+                    >
+                      {bank.unemployment.toFixed(1)}%
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "'Consolas', monospace",
+                        fontSize: '9px',
+                        textAlign: 'right',
+                        color: bank.gdp >= 2 ? COLORS.positive : bank.gdp < 1 ? COLORS.negative : COLORS.textPrimary,
+                      }}
+                    >
+                      {bank.gdp.toFixed(1)}%
+                    </span>
+                  </div>
+                ))}
+              </Panel>
+              
+              <Panel title="Upcoming Meetings">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {Object.entries(CENTRAL_BANKS)
+                    .sort(([, a], [, b]) => new Date(a.nextMeeting) - new Date(b.nextMeeting))
+                    .slice(0, 5)
+                    .map(([code, bank]) => (
+                      <div
+                        key={code}
+                        style={{
+                          padding: '8px',
+                          background: COLORS.bgSecondary,
+                          borderRadius: '4px',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <div>
+                          <div
+                            style={{
+                              fontSize: '9px',
+                              fontWeight: 700,
+                              color: COLORS.primary,
+                              marginBottom: '2px',
+                            }}
+                          >
+                            {code}
+                          </div>
+                          <div style={{ fontSize: '8px', color: COLORS.textMuted }}>
+                            {bank.name}
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            fontFamily: "'Consolas', monospace",
+                            fontSize: '9px',
+                            fontWeight: 700,
+                            color: COLORS.textPrimary,
+                          }}
+                        >
+                          {new Date(bank.nextMeeting).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </Panel>
+            </div>
+          </div>
+        )}
+
         {/* ==================== TRENDS ==================== */}
         {tab === 'trends' && (
           <div
@@ -4051,5 +4488,6 @@ export default function IgeaOmnisPro() {
       </div>
       {/* END ZOOMABLE CONTENT WRAPPER */}
     </div>
+    </>
   );
 }
