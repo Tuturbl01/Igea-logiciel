@@ -408,6 +408,7 @@ const STOCKS = {
     ebitda: 123.1,
     netIncome: 97.0,
     employees: 164000,
+    history: generateHistory(182, 0.015, 365, 0.18),
   },
   MSFT: {
     name: 'Microsoft Corp.',
@@ -426,6 +427,7 @@ const STOCKS = {
     ebitda: 108.8,
     netIncome: 82.5,
     employees: 221000,
+    history: generateHistory(400, 0.014, 365, 0.20),
   },
   GOOGL: {
     name: 'Alphabet Inc.',
@@ -444,6 +446,7 @@ const STOCKS = {
     ebitda: 97.5,
     netIncome: 73.8,
     employees: 182000,
+    history: generateHistory(168, 0.016, 365, 0.22),
   },
   AMZN: {
     name: 'Amazon.com Inc.',
@@ -462,6 +465,7 @@ const STOCKS = {
     ebitda: 85.4,
     netIncome: 37.7,
     employees: 1540000,
+    history: generateHistory(178, 0.017, 365, 0.19),
   },
   NVDA: {
     name: 'NVIDIA Corp.',
@@ -480,6 +484,7 @@ const STOCKS = {
     ebitda: 35.2,
     netIncome: 29.8,
     employees: 29600,
+    history: generateHistory(880, 0.025, 365, 0.42),
   },
   META: {
     name: 'Meta Platforms',
@@ -498,6 +503,7 @@ const STOCKS = {
     ebitda: 58.4,
     netIncome: 46.8,
     employees: 67317,
+    history: generateHistory(500, 0.022, 365, 0.28),
   },
   TSLA: {
     name: 'Tesla Inc.',
@@ -516,6 +522,7 @@ const STOCKS = {
     ebitda: 14.2,
     netIncome: 12.6,
     employees: 140000,
+    history: generateHistory(236, 0.028, 365, 0.15),
   },
   JPM: {
     name: 'JPMorgan Chase',
@@ -534,6 +541,7 @@ const STOCKS = {
     ebitda: 0,
     netIncome: 49.6,
     employees: 309000,
+    history: generateHistory(190, 0.011, 365, 0.12),
   },
   V: {
     name: 'Visa Inc.',
@@ -552,6 +560,7 @@ const STOCKS = {
     ebitda: 21.4,
     netIncome: 17.3,
     employees: 29500,
+    history: generateHistory(266, 0.013, 365, 0.14),
   },
   JNJ: {
     name: 'Johnson & Johnson',
@@ -570,6 +579,7 @@ const STOCKS = {
     ebitda: 28.4,
     netIncome: 22.8,
     employees: 131900,
+    history: generateHistory(142, 0.009, 365, 0.08),
   },
 };
 
@@ -723,6 +733,62 @@ const POLYMARKET = [
     category: 'Geopolitics',
     change: 1.1,
   },
+  {
+    id: 9,
+    title: 'Tesla reaches $500 stock price in 2025',
+    yes: 28.4,
+    volume: 95.3,
+    category: 'Markets',
+    change: 3.7,
+  },
+  {
+    id: 10,
+    title: 'Ethereum ETF launches by Q3 2025',
+    yes: 67.2,
+    volume: 112.8,
+    category: 'Crypto',
+    change: -0.5,
+  },
+  {
+    id: 11,
+    title: 'Major US bank fails in 2025',
+    yes: 5.8,
+    volume: 43.2,
+    category: 'Markets',
+    change: -1.2,
+  },
+  {
+    id: 12,
+    title: 'Apple releases AR glasses by end of 2025',
+    yes: 42.1,
+    volume: 87.6,
+    category: 'Tech',
+    change: 2.8,
+  },
+  {
+    id: 13,
+    title: 'Oil prices above $100/barrel by mid-2025',
+    yes: 31.5,
+    volume: 68.4,
+    category: 'Commodities',
+    change: 1.9,
+  },
+  {
+    id: 14,
+    title: 'Global inflation drops below 2% by 2026',
+    yes: 55.7,
+    volume: 91.2,
+    category: 'Macro',
+    change: -2.1,
+  },
+  {
+    id: 15,
+    title: 'Major AI breakthrough announced in 2025',
+    yes: 73.4,
+    volume: 134.5,
+    category: 'Tech',
+    change: 4.2,
+  },
 ];
 
 // News
@@ -734,6 +800,7 @@ const NEWS = [
     time: '12 min ago',
     category: 'Macro',
     impact: 'high',
+    url: 'https://www.reuters.com/markets/us/fed-rate-cut-inflation-2025',
   },
   {
     id: 2,
@@ -742,6 +809,7 @@ const NEWS = [
     time: '34 min ago',
     category: 'Earnings',
     impact: 'high',
+    url: 'https://www.bloomberg.com/news/nvidia-earnings-q4-2025',
   },
   {
     id: 3,
@@ -750,6 +818,7 @@ const NEWS = [
     time: '1 hour ago',
     category: 'Macro',
     impact: 'medium',
+    url: 'https://www.ft.com/content/ecb-rates-lagarde-2025',
   },
   {
     id: 4,
@@ -758,6 +827,7 @@ const NEWS = [
     time: '2 hours ago',
     category: 'Corporate',
     impact: 'high',
+    url: 'https://www.cnbc.com/apple-buyback-110b-2025',
   },
   {
     id: 5,
@@ -766,6 +836,7 @@ const NEWS = [
     time: '2 hours ago',
     category: 'Commodities',
     impact: 'medium',
+    url: 'https://www.reuters.com/markets/commodities/oil-prices-inventories-2025',
   },
   {
     id: 6,
@@ -774,6 +845,7 @@ const NEWS = [
     time: '3 hours ago',
     category: 'Macro',
     impact: 'medium',
+    url: 'https://www.bloomberg.com/news/china-manufacturing-pmi-2025',
   },
   {
     id: 7,
@@ -782,6 +854,7 @@ const NEWS = [
     time: '4 hours ago',
     category: 'Earnings',
     impact: 'medium',
+    url: 'https://www.wsj.com/articles/microsoft-azure-revenue-2025',
   },
   {
     id: 8,
@@ -790,6 +863,7 @@ const NEWS = [
     time: '5 hours ago',
     category: 'Crypto',
     impact: 'medium',
+    url: 'https://www.coindesk.com/markets/bitcoin-etf-inflows-2025',
   },
   {
     id: 9,
@@ -798,6 +872,7 @@ const NEWS = [
     time: '6 hours ago',
     category: 'Corporate',
     impact: 'high',
+    url: 'https://www.reuters.com/business/autos-transportation/tesla-recall-autopilot-2025',
   },
   {
     id: 10,
@@ -806,6 +881,7 @@ const NEWS = [
     time: '7 hours ago',
     category: 'Forex',
     impact: 'medium',
+    url: 'https://asia.nikkei.com/Economy/Bank-of-Japan-yen-intervention-2025',
   },
 ];
 
@@ -1378,8 +1454,10 @@ export default function IgeaOmnisPro() {
 
   // Handle news click
   const handleNewsClick = (news) => {
-    // Open news in new tab - in production this would link to actual article
-    alert(`Opening: ${news.title}\nSource: ${news.source}\nCategory: ${news.category}`);
+    // Open news article in new tab
+    if (news.url) {
+      window.open(news.url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   // Get autocomplete suggestions
