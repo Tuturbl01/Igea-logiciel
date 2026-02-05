@@ -1165,8 +1165,9 @@ const SectorHeatmap = ({ sectors }) => (
   </div>
 );
 
-const NewsCard = ({ news }) => (
+const NewsCard = ({ news, onClick }) => (
   <div
+    onClick={() => onClick && onClick(news)}
     style={{
       padding: '10px 12px',
       borderBottom: `1px solid ${COLORS.borderLight}`,
@@ -1236,11 +1237,26 @@ export default function IgeaOmnisPro() {
   const [compareInput, setCompareInput] = useState('');
   const [reportAssets, setReportAssets] = useState(['AAPL', 'MSFT', 'GOOGL']);
   const [newsFilter, setNewsFilter] = useState('All');
+  const [reportType, setReportType] = useState('Market Overview');
+  const [trendSector, setTrendSector] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [zoomLevel, setZoomLevel] = useState(100);
+  const [autoRefresh, setAutoRefresh] = useState(false);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
+
+  // Auto-refresh data every 10 seconds when enabled
+  useEffect(() => {
+    if (!autoRefresh) return;
+    const interval = setInterval(() => {
+      // Simulate data refresh - in production, this would call APIs
+      console.log('Auto-refreshing data...');
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [autoRefresh]);
 
   // Regime calculation
   const regimeScore = useMemo(() => {
@@ -1304,6 +1320,105 @@ export default function IgeaOmnisPro() {
     }
   };
 
+  // Generate Excel Report Handler
+  const generateExcelReport = () => {
+    // Create CSV data
+    const headers = ['Asset', 'Name', 'Price', 'Change %', 'P/E', 'Market Cap'];
+    const rows = reportAssets.map((ticker) => {
+      const asset = STOCKS[ticker] || allAssets[ticker];
+      return [
+        ticker,
+        asset?.name || '-',
+        asset?.price?.toFixed(2) || '-',
+        asset?.change?.toFixed(2) || '-',
+        asset?.pe?.toFixed(1) || '-',
+        asset?.marketCap || '-',
+      ];
+    });
+
+    // Convert to CSV
+    const csv = [
+      headers.join(','),
+      ...rows.map((row) => row.join(',')),
+    ].join('\n');
+
+    // Download
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `igea_${reportType.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Download Compare Data Handler
+  const downloadCompareData = () => {
+    if (!compareData.length) return;
+    
+    const headers = ['Date', ...compareAssets];
+    const rows = compareData.map((row) => [
+      row.date,
+      ...compareAssets.map((asset) => row[asset]?.toFixed(2) || '-'),
+    ]);
+
+    const csv = [
+      headers.join(','),
+      ...rows.map((row) => row.join(',')),
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `igea_comparison_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Handle news click
+  const handleNewsClick = (news) => {
+    // Open news in new tab - in production this would link to actual article
+    alert(`Opening: ${news.title}\nSource: ${news.source}\nCategory: ${news.category}`);
+  };
+
+  // Get autocomplete suggestions
+  const getAssetSuggestions = (input) => {
+    if (!input) return [];
+    const query = input.toUpperCase();
+    return Object.keys(allAssets)
+      .filter((ticker) => 
+        ticker.startsWith(query) || 
+        allAssets[ticker]?.name?.toUpperCase().includes(query)
+      )
+      .slice(0, 5);
+  };
+
+  // Filter predictions to only future events
+  const futurePredictions = useMemo(() => {
+    const now = new Date();
+    return POLYMARKET.filter((pred) => {
+      // Extract year from title
+      const yearMatch = pred.title.match(/\b(202[4-9]|20[3-9]\d)\b/);
+      if (!yearMatch) return true; // Keep if no year specified
+      const predYear = parseInt(yearMatch[0]);
+      return predYear >= now.getFullYear();
+    });
+  }, []);
+
+  // Filtered companies by search
+  const filteredStocks = useMemo(() => {
+    if (!searchQuery) return STOCKS;
+    const query = searchQuery.toLowerCase();
+    return Object.fromEntries(
+      Object.entries(STOCKS).filter(([ticker, data]) =>
+        ticker.toLowerCase().includes(query) ||
+        data.name.toLowerCase().includes(query) ||
+        data.sector.toLowerCase().includes(query)
+      )
+    );
+  }, [searchQuery]);
+
   const chartColors = [
     COLORS.chart1,
     COLORS.chart2,
@@ -1334,6 +1449,9 @@ export default function IgeaOmnisPro() {
         background: COLORS.bgSecondary,
         fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
         color: COLORS.textPrimary,
+        transform: `scale(${zoomLevel / 100})`,
+        transformOrigin: 'top center',
+        transition: 'transform 0.2s ease',
       }}
     >
       {/* HEADER */}
@@ -1434,21 +1552,56 @@ export default function IgeaOmnisPro() {
             {time.toLocaleTimeString('en-US', { hour12: false })}
           </span>
           <button
+            onClick={() => setAutoRefresh(!autoRefresh)}
             style={{
-              background: 'transparent',
-              border: `1px solid ${COLORS.textMuted}`,
-              color: COLORS.textMuted,
+              background: autoRefresh ? COLORS.positive : 'transparent',
+              border: `1px solid ${autoRefresh ? COLORS.positive : COLORS.textMuted}`,
+              color: autoRefresh ? COLORS.textInverse : COLORS.textMuted,
               padding: '3px 8px',
               cursor: 'pointer',
               fontSize: '9px',
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
+              borderRadius: '3px',
             }}
           >
             <RefreshCw size={10} />
-            REFRESH
+            {autoRefresh ? 'AUTO ON' : 'REFRESH'}
           </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <button
+              onClick={() => setZoomLevel(Math.max(50, zoomLevel - 10))}
+              style={{
+                background: 'transparent',
+                border: `1px solid ${COLORS.textMuted}`,
+                color: COLORS.textMuted,
+                padding: '3px 6px',
+                cursor: 'pointer',
+                fontSize: '9px',
+                borderRadius: '3px',
+              }}
+            >
+              -
+            </button>
+            <span style={{ color: COLORS.textMuted, fontSize: '9px', minWidth: '35px', textAlign: 'center' }}>
+              {zoomLevel}%
+            </span>
+            <button
+              onClick={() => setZoomLevel(Math.min(150, zoomLevel + 10))}
+              style={{
+                background: 'transparent',
+                border: `1px solid ${COLORS.textMuted}`,
+                color: COLORS.textMuted,
+                padding: '3px 6px',
+                cursor: 'pointer',
+                fontSize: '9px',
+                borderRadius: '3px',
+              }}
+            >
+              +
+            </button>
+          </div>
         </div>
       </header>
 
@@ -1883,7 +2036,7 @@ export default function IgeaOmnisPro() {
               </Panel>
               <Panel title="Latest News" noPad>
                 {NEWS.slice(0, 4).map((n) => (
-                  <NewsCard key={n.id} news={n} />
+                  <NewsCard key={n.id} news={n} onClick={handleNewsClick} />
                 ))}
               </Panel>
             </div>
@@ -2245,35 +2398,83 @@ export default function IgeaOmnisPro() {
               style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
             >
               <Panel title="Assets">
-                <div
-                  style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}
-                >
-                  <input
-                    value={compareInput}
-                    onChange={(e) => setCompareInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && addCompareAsset()}
-                    placeholder="Add ticker..."
-                    style={{
-                      flex: 1,
-                      padding: '6px 10px',
-                      border: `1px solid ${COLORS.border}`,
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                    }}
-                  />
-                  <button
-                    onClick={addCompareAsset}
-                    style={{
-                      padding: '6px 10px',
-                      border: 'none',
-                      background: COLORS.primary,
-                      color: COLORS.textInverse,
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                    }}
+                <div style={{ position: 'relative' }}>
+                  <div
+                    style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}
                   >
-                    <PlusCircle size={14} />
-                  </button>
+                    <input
+                      value={compareInput}
+                      onChange={(e) => setCompareInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && addCompareAsset()}
+                      placeholder="Add ticker or name..."
+                      style={{
+                        flex: 1,
+                        padding: '6px 10px',
+                        border: `1px solid ${COLORS.border}`,
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                      }}
+                    />
+                    <button
+                      onClick={addCompareAsset}
+                      style={{
+                        padding: '6px 10px',
+                        border: 'none',
+                        background: COLORS.primary,
+                        color: COLORS.textInverse,
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <PlusCircle size={14} />
+                    </button>
+                  </div>
+                  {compareInput && getAssetSuggestions(compareInput).length > 0 && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '40px',
+                        left: 0,
+                        right: '50px',
+                        background: COLORS.bgPrimary,
+                        border: `1px solid ${COLORS.border}`,
+                        borderRadius: '4px',
+                        zIndex: 1000,
+                        maxHeight: '150px',
+                        overflowY: 'auto',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      }}
+                    >
+                      {getAssetSuggestions(compareInput).map((ticker) => (
+                        <div
+                          key={ticker}
+                          onClick={() => {
+                            setCompareInput(ticker);
+                            addCompareAsset();
+                          }}
+                          style={{
+                            padding: '8px 10px',
+                            cursor: 'pointer',
+                            borderBottom: `1px solid ${COLORS.borderLight}`,
+                            fontSize: '11px',
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.background = COLORS.bgSecondary)
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.background = 'transparent')
+                          }
+                        >
+                          <div style={{ fontWeight: 600, color: COLORS.primary }}>
+                            {ticker}
+                          </div>
+                          <div style={{ fontSize: '9px', color: COLORS.textTertiary }}>
+                            {allAssets[ticker]?.name}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {compareAssets.map((a, i) => (
                   <div
@@ -2324,68 +2525,98 @@ export default function IgeaOmnisPro() {
                   </div>
                 ))}
               </Panel>
-              <Panel title="Period Returns">
-                <div
-                  style={{
-                    fontSize: '8px',
-                    color: COLORS.textMuted,
-                    padding: '4px 0',
-                    display: 'grid',
-                    gridTemplateColumns: '60px repeat(6, 1fr)',
-                    gap: '4px',
-                    borderBottom: `1px solid ${COLORS.borderLight}`,
-                  }}
-                >
-                  <span>TICKER</span>
-                  {['1D', '1W', '1M', '3M', 'YTD', '1Y'].map((p) => (
-                    <span key={p} style={{ textAlign: 'right' }}>
-                      {p}
-                    </span>
-                  ))}
-                </div>
-                {compareAssets.map((a) => (
-                  <div
-                    key={a}
+              <Panel 
+                title="Period Returns"
+                action={
+                  <button
+                    onClick={downloadCompareData}
                     style={{
+                      padding: '2px 8px',
+                      border: 'none',
+                      background: COLORS.primary,
+                      color: COLORS.textInverse,
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      borderRadius: '3px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <Download size={10} /> CSV
+                  </button>
+                }
+              >
+                <div style={{ overflowX: 'auto' }}>
+                  <div
+                    style={{
+                      fontSize: '8px',
+                      color: COLORS.textMuted,
+                      padding: '4px 0',
                       display: 'grid',
                       gridTemplateColumns: '60px repeat(6, 1fr)',
                       gap: '4px',
-                      padding: '6px 0',
                       borderBottom: `1px solid ${COLORS.borderLight}`,
+                      minWidth: '240px',
                     }}
                   >
-                    <span
+                    <span>TICKER</span>
+                    {['1D', '1W', '1M', '3M', 'YTD', '1Y'].map((p) => (
+                      <span key={p} style={{ textAlign: 'right' }}>
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                  {compareAssets.map((a) => (
+                    <div
+                      key={a}
                       style={{
-                        fontFamily: "'Consolas', monospace",
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        color: COLORS.primary,
+                        display: 'grid',
+                        gridTemplateColumns: '60px repeat(6, 1fr)',
+                        gap: '4px',
+                        padding: '6px 0',
+                        borderBottom: `1px solid ${COLORS.borderLight}`,
+                        minWidth: '240px',
                       }}
                     >
-                      {a}
-                    </span>
-                    {['1D', '1W', '1M', '3M', 'YTD', '1Y'].map((p) => {
-                      const ret = calculatePeriodReturn(
-                        allAssets[a]?.history,
-                        p
-                      );
-                      return (
-                        <span
-                          key={p}
-                          style={{
-                            fontFamily: "'Consolas', monospace",
-                            fontSize: '10px',
-                            fontWeight: 600,
-                            textAlign: 'right',
-                            color: ret >= 0 ? COLORS.positive : COLORS.negative,
-                          }}
-                        >
-                          {fmtChg(ret)}
-                        </span>
-                      );
-                    })}
-                  </div>
-                ))}
+                      <span
+                        style={{
+                          fontFamily: "'Consolas', monospace",
+                          fontWeight: 700,
+                          fontSize: '10px',
+                          color: COLORS.primary,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {a}
+                      </span>
+                      {['1D', '1W', '1M', '3M', 'YTD', '1Y'].map((p) => {
+                        const ret = calculatePeriodReturn(
+                          allAssets[a]?.history,
+                          p
+                        );
+                        return (
+                          <span
+                            key={p}
+                            style={{
+                              fontFamily: "'Consolas', monospace",
+                              fontSize: '10px',
+                              fontWeight: 600,
+                              textAlign: 'right',
+                              color: ret >= 0 ? COLORS.positive : COLORS.negative,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {fmtChg(ret)}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
               </Panel>
             </div>
           </div>
@@ -2401,8 +2632,26 @@ export default function IgeaOmnisPro() {
             }}
           >
             <Panel title="Companies" noPad>
+              <div style={{ padding: '10px', borderBottom: `1px solid ${COLORS.borderLight}` }}>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <Search size={14} color={COLORS.textMuted} />
+                  <input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search companies..."
+                    style={{
+                      flex: 1,
+                      padding: '6px 8px',
+                      border: `1px solid ${COLORS.border}`,
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+              </div>
               <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-                {Object.entries(STOCKS).map(([t, d]) => (
+                {Object.entries(filteredStocks).map(([t, d]) => (
                   <div
                     key={t}
                     onClick={() => setSelectedStock(t)}
@@ -2751,7 +3000,7 @@ export default function IgeaOmnisPro() {
               {NEWS.filter(
                 (n) => newsFilter === 'All' || n.category === newsFilter
               ).map((n) => (
-                <NewsCard key={n.id} news={n} />
+                <NewsCard key={n.id} news={n} onClick={handleNewsClick} />
               ))}
             </Panel>
             <div
@@ -2925,7 +3174,35 @@ export default function IgeaOmnisPro() {
               gap: '12px',
             }}
           >
-            <Panel title="Google Trends — Interest Over Time">
+            <Panel 
+              title="Google Trends — Interest Over Time"
+              action={
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {['All', 'Markets', 'Macro', 'Tech', 'Crypto'].map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => setTrendSector(c)}
+                      style={{
+                        padding: '2px 8px',
+                        border: 'none',
+                        background:
+                          trendSector === c ? COLORS.primary : 'transparent',
+                        color:
+                          trendSector === c
+                            ? COLORS.textInverse
+                            : COLORS.textMuted,
+                        fontSize: '9px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        borderRadius: '3px',
+                      }}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              }
+            >
               <ResponsiveContainer width="100%" height={350}>
                 <LineChart data={GOOGLE_TRENDS}>
                   <CartesianGrid
@@ -3103,7 +3380,7 @@ export default function IgeaOmnisPro() {
                 <span style={{ textAlign: 'right' }}>24H Δ</span>
                 <span style={{ textAlign: 'right' }}>VOLUME</span>
               </div>
-              {POLYMARKET.map((m) => (
+              {futurePredictions.map((m) => (
                 <div
                   key={m.id}
                   style={{
@@ -3168,7 +3445,7 @@ export default function IgeaOmnisPro() {
             </Panel>
             <Panel title="Probability Distribution">
               <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={POLYMARKET} layout="vertical">
+                <BarChart data={futurePredictions} layout="vertical">
                   <CartesianGrid
                     strokeDasharray="1 1"
                     stroke={COLORS.borderLight}
@@ -3393,19 +3670,23 @@ export default function IgeaOmnisPro() {
                 ].map((t) => (
                   <div
                     key={t}
+                    onClick={() => setReportType(t)}
                     style={{
                       padding: '8px 12px',
-                      border: `1px solid ${COLORS.border}`,
+                      border: `1px solid ${reportType === t ? COLORS.primary : COLORS.border}`,
+                      background: reportType === t ? `${COLORS.primary}10` : 'transparent',
                       marginBottom: '4px',
                       borderRadius: '4px',
                       cursor: 'pointer',
                       fontSize: '11px',
+                      color: reportType === t ? COLORS.primary : COLORS.textPrimary,
+                      fontWeight: reportType === t ? 600 : 400,
                     }}
                     onMouseEnter={(e) =>
-                      (e.currentTarget.style.background = COLORS.bgSecondary)
+                      reportType !== t && (e.currentTarget.style.background = COLORS.bgSecondary)
                     }
                     onMouseLeave={(e) =>
-                      (e.currentTarget.style.background = 'transparent')
+                      reportType !== t && (e.currentTarget.style.background = 'transparent')
                     }
                   >
                     {t}
@@ -3413,6 +3694,7 @@ export default function IgeaOmnisPro() {
                 ))}
               </div>
               <button
+                onClick={generateExcelReport}
                 style={{
                   width: '100%',
                   padding: '12px',
