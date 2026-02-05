@@ -3739,13 +3739,14 @@ export default function IgeaOmnisPro() {
 
         {/* ==================== CENTRAL BANKS ==================== */}
         {tab === 'centralbanks' && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '12px',
-            }}
-          >
+          <div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '12px',
+              }}
+            >
             <Panel title="Central Banks Overview" noPad>
               <div
                 style={{
@@ -4009,6 +4010,7 @@ export default function IgeaOmnisPro() {
                 </LineChart>
               </ResponsiveContainer>
             </Panel>
+          </div>
           </div>
         )}
 
