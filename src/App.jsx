@@ -2229,7 +2229,7 @@ export default function IgeaOmnisPro() {
                 }
                 noPad
               >
-                {POLYMARKET.slice(0, 5).map((m) => (
+                {futurePredictions.slice(0, 5).map((m) => (
                   <div
                     key={m.id}
                     style={{
