@@ -1449,9 +1449,6 @@ export default function IgeaOmnisPro() {
         background: COLORS.bgSecondary,
         fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
         color: COLORS.textPrimary,
-        transform: `scale(${zoomLevel / 100})`,
-        transformOrigin: 'top center',
-        transition: 'transform 0.2s ease',
       }}
     >
       {/* HEADER */}
@@ -1605,17 +1602,25 @@ export default function IgeaOmnisPro() {
         </div>
       </header>
 
-      {/* TICKER BAR */}
+      {/* ZOOMABLE CONTENT WRAPPER */}
       <div
         style={{
-          background: COLORS.bgPrimary,
-          borderBottom: `1px solid ${COLORS.border}`,
-          padding: '5px 16px',
-          display: 'flex',
-          gap: '20px',
-          overflowX: 'auto',
+          transform: `scale(${zoomLevel / 100})`,
+          transformOrigin: 'top center',
+          transition: 'transform 0.2s ease',
         }}
       >
+        {/* TICKER BAR */}
+        <div
+          style={{
+            background: COLORS.bgPrimary,
+            borderBottom: `1px solid ${COLORS.border}`,
+            padding: '5px 16px',
+            display: 'flex',
+            gap: '20px',
+            overflowX: 'auto',
+          }}
+        >
         {Object.entries(INDICES)
           .slice(0, 6)
           .map(([t, d]) => (
@@ -3913,6 +3918,8 @@ export default function IgeaOmnisPro() {
           informational purposes only — Not financial advice
         </div>
       </footer>
+      </div>
+      {/* END ZOOMABLE CONTENT WRAPPER */}
     </div>
   );
 }
