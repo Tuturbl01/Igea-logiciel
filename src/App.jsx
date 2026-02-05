@@ -3628,6 +3628,58 @@ export default function IgeaOmnisPro() {
                   {fmtChg(INDICES[selectedIndex]?.change)}
                 </span>
               </div>
+              <div style={{ marginBottom: '16px' }}>
+                <div
+                  style={{
+                    fontSize: '9px',
+                    fontWeight: 700,
+                    color: COLORS.textTertiary,
+                    marginBottom: '8px',
+                  }}
+                >
+                  PERIOD RETURNS
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {['1D', '1W', '1M', '3M', 'YTD', '1Y'].map((p) => {
+                    const ret = calculatePeriodReturn(
+                      INDICES[selectedIndex]?.history,
+                      p
+                    );
+                    return (
+                      <div
+                        key={p}
+                        style={{
+                          flex: 1,
+                          padding: '8px',
+                          background: COLORS.bgSecondary,
+                          borderRadius: '4px',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: '9px',
+                            color: COLORS.textMuted,
+                            marginBottom: '4px',
+                          }}
+                        >
+                          {p}
+                        </div>
+                        <div
+                          style={{
+                            fontFamily: "'Consolas', monospace",
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            color: ret >= 0 ? COLORS.positive : COLORS.negative,
+                          }}
+                        >
+                          {fmtChg(ret)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
               <ResponsiveContainer width="100%" height={280}>
                 <AreaChart data={INDICES[selectedIndex]?.history || []}>
                   <defs>
