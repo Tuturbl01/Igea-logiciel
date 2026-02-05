@@ -1633,6 +1633,11 @@ export default function IgeaOmnisPro() {
   const [searchQuery, setSearchQuery] = useState('');
   const [zoomLevel, setZoomLevel] = useState(100);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  
+  // Period selection states for different tabs/charts
+  const [marketsPeriod, setMarketsPeriod] = useState('1Y');
+  const [forexPeriod, setForexPeriod] = useState('1Y');
+  const [researchPeriod, setResearchPeriod] = useState('1Y');
 
   // ============================================================================
   // DYNAMIC MARKET DATA STATE
@@ -1781,6 +1786,49 @@ export default function IgeaOmnisPro() {
     
     return () => clearInterval(interval);
   }, [liveMode]);
+
+  // ============================================================================
+  // PERIOD FILTERING HELPER
+  // ============================================================================
+  const filterHistoryByPeriod = (history, period) => {
+    if (!history || history.length === 0) return [];
+    
+    const now = new Date();
+    let daysAgo = 0;
+    
+    switch (period) {
+      case '1D':
+        daysAgo = 1;
+        break;
+      case '1W':
+        daysAgo = 7;
+        break;
+      case 'WTD': // Week to date
+        daysAgo = now.getDay() || 7;
+        break;
+      case '1M':
+        daysAgo = 30;
+        break;
+      case 'MTD': // Month to date
+        daysAgo = now.getDate();
+        break;
+      case '3M':
+        daysAgo = 90;
+        break;
+      case 'YTD': // Year to date
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+        daysAgo = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
+        break;
+      case '1Y':
+        daysAgo = 365;
+        break;
+      default:
+        return history; // Return full history if period not recognized
+    }
+    
+    // Return last N days of data
+    return history.slice(-daysAgo);
+  };
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -2504,17 +2552,21 @@ export default function IgeaOmnisPro() {
                       return (
                         <div
                           key={p}
+                          onClick={() => setMarketsPeriod(p)}
                           style={{
                             textAlign: 'center',
                             padding: '4px 8px',
-                            background: COLORS.bgSecondary,
+                            background: marketsPeriod === p ? COLORS.primary : COLORS.bgSecondary,
                             borderRadius: '4px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            border: marketsPeriod === p ? `2px solid ${COLORS.primaryDark}` : '2px solid transparent',
                           }}
                         >
                           <div
                             style={{
                               fontSize: '8px',
-                              color: COLORS.textTertiary,
+                              color: marketsPeriod === p ? COLORS.textInverse : COLORS.textTertiary,
                             }}
                           >
                             {p}
@@ -2524,8 +2576,9 @@ export default function IgeaOmnisPro() {
                               fontSize: '10px',
                               fontWeight: 700,
                               fontFamily: "'Consolas', monospace",
-                              color:
-                                ret >= 0 ? COLORS.positive : COLORS.negative,
+                              color: marketsPeriod === p 
+                                ? COLORS.textInverse
+                                : (ret >= 0 ? COLORS.positive : COLORS.negative),
                             }}
                           >
                             {fmtChg(ret)}
@@ -2536,7 +2589,7 @@ export default function IgeaOmnisPro() {
                   </div>
                 </div>
                 <ResponsiveContainer width="100%" height={220}>
-                  <AreaChart data={allAssets[selectedIndex]?.history || []}>
+                  <AreaChart data={filterHistoryByPeriod(allAssets[selectedIndex]?.history || [], marketsPeriod)}>
                     <defs>
                       <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
                         <stop
@@ -2894,7 +2947,7 @@ export default function IgeaOmnisPro() {
                   </div>
                 </div>
                 <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={FOREX[selectedForex]?.history || []}>
+                  <AreaChart data={filterHistoryByPeriod(FOREX[selectedForex]?.history || [], forexPeriod)}>
                     <defs>
                       <linearGradient id="fxGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop
@@ -2955,17 +3008,21 @@ export default function IgeaOmnisPro() {
                     return (
                       <div
                         key={p}
+                        onClick={() => setForexPeriod(p)}
                         style={{
                           textAlign: 'center',
                           padding: '10px',
-                          background: COLORS.bgSecondary,
+                          background: forexPeriod === p ? COLORS.primary : COLORS.bgSecondary,
                           borderRadius: '4px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          border: forexPeriod === p ? `2px solid ${COLORS.primaryDark}` : '2px solid transparent',
                         }}
                       >
                         <div
                           style={{
                             fontSize: '10px',
-                            color: COLORS.textTertiary,
+                            color: forexPeriod === p ? COLORS.textInverse : COLORS.textTertiary,
                             marginBottom: '4px',
                           }}
                         >
@@ -2976,7 +3033,9 @@ export default function IgeaOmnisPro() {
                             fontSize: '14px',
                             fontWeight: 700,
                             fontFamily: "'Consolas', monospace",
-                            color: ret >= 0 ? COLORS.positive : COLORS.negative,
+                            color: forexPeriod === p
+                              ? COLORS.textInverse
+                              : (ret >= 0 ? COLORS.positive : COLORS.negative),
                           }}
                         >
                           {fmtChg(ret)}
