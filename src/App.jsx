@@ -1278,7 +1278,7 @@ export default function IgeaOmnisPro() {
 
   // All assets for comparison
   const allAssets = useMemo(
-    () => ({ ...INDICES, ...FOREX, ...CRYPTO, ...COMMODITIES }),
+    () => ({ ...INDICES, ...FOREX, ...CRYPTO, ...COMMODITIES, ...STOCKS }),
     []
   );
 
@@ -2449,8 +2449,10 @@ export default function IgeaOmnisPro() {
                         <div
                           key={ticker}
                           onClick={() => {
-                            setCompareInput(ticker);
-                            addCompareAsset();
+                            if (!compareAssets.includes(ticker)) {
+                              setCompareAssets([...compareAssets, ticker]);
+                            }
+                            setCompareInput('');
                           }}
                           style={{
                             padding: '8px 10px',
