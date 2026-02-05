@@ -1403,6 +1403,8 @@ export default function IgeaOmnisPro() {
   const [compareAssets, setCompareAssets] = useState(['SPX', 'NDX', 'BTCUSD']);
   const [comparePeriod, setComparePeriod] = useState('YTD');
   const [compareInput, setCompareInput] = useState('');
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
   const [reportAssets, setReportAssets] = useState(['AAPL', 'MSFT', 'GOOGL']);
   const [newsFilter, setNewsFilter] = useState('All');
   const [reportType, setReportType] = useState('Market Overview');
@@ -1470,17 +1472,29 @@ export default function IgeaOmnisPro() {
       });
       result.push(point);
     }
+    
+    // Filter by custom date range if specified
+    let filtered = result;
+    if (customStartDate || customEndDate) {
+      filtered = result.filter((p) => {
+        const pointDate = new Date(p.date);
+        const start = customStartDate ? new Date(customStartDate) : new Date('2000-01-01');
+        const end = customEndDate ? new Date(customEndDate) : new Date('2100-01-01');
+        return pointDate >= start && pointDate <= end;
+      });
+    }
+    
     // Normalize to 100
-    const normalized = result.map((p, i) => {
+    const normalized = filtered.map((p, i) => {
       const norm = { date: p.date };
       compareAssets.forEach((a) => {
-        const base = result[0]?.[a];
+        const base = filtered[0]?.[a];
         if (base && p[a]) norm[a] = (p[a] / base) * 100;
       });
       return norm;
     });
     return normalized;
-  }, [compareAssets, allAssets]);
+  }, [compareAssets, allAssets, customStartDate, customEndDate]);
 
   const addCompareAsset = () => {
     const ticker = compareInput.toUpperCase().trim();
@@ -2619,32 +2633,76 @@ export default function IgeaOmnisPro() {
             <Panel
               title="Custom Comparison — Normalized Performance (Base 100)"
               action={
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  {['1W', 'WTD', '1M', 'MTD', '3M', '6M', 'YTD', '1Y'].map(
-                    (p) => (
-                      <button
-                        key={p}
-                        onClick={() => setComparePeriod(p)}
-                        style={{
-                          padding: '2px 8px',
-                          border: 'none',
-                          background:
-                            comparePeriod === p
-                              ? COLORS.primary
-                              : 'transparent',
-                          color:
-                            comparePeriod === p
-                              ? COLORS.textInverse
-                              : COLORS.textMuted,
-                          fontSize: '9px',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {p}
-                      </button>
-                    )
-                  )}
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    {['1W', 'WTD', '1M', 'MTD', '3M', '6M', 'YTD', '1Y'].map(
+                      (p) => (
+                        <button
+                          key={p}
+                          onClick={() => {
+                            setComparePeriod(p);
+                            setCustomStartDate('');
+                            setCustomEndDate('');
+                          }}
+                          style={{
+                            padding: '2px 8px',
+                            border: 'none',
+                            background:
+                              comparePeriod === p && !customStartDate
+                                ? COLORS.primary
+                                : 'transparent',
+                            color:
+                              comparePeriod === p && !customStartDate
+                                ? COLORS.textInverse
+                                : COLORS.textMuted,
+                            fontSize: '9px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {p}
+                        </button>
+                      )
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: '4px', alignItems: 'center', borderLeft: `1px solid ${COLORS.border}`, paddingLeft: '8px' }}>
+                    <Calendar size={12} color={COLORS.textMuted} />
+                    <input
+                      type="date"
+                      value={customStartDate}
+                      onChange={(e) => {
+                        setCustomStartDate(e.target.value);
+                        setComparePeriod('Custom');
+                      }}
+                      style={{
+                        padding: '2px 4px',
+                        border: `1px solid ${COLORS.border}`,
+                        background: COLORS.bgSecondary,
+                        color: COLORS.textPrimary,
+                        fontSize: '9px',
+                        borderRadius: '2px',
+                        fontFamily: "'Consolas', monospace",
+                      }}
+                    />
+                    <span style={{ fontSize: '9px', color: COLORS.textMuted }}>to</span>
+                    <input
+                      type="date"
+                      value={customEndDate}
+                      onChange={(e) => {
+                        setCustomEndDate(e.target.value);
+                        setComparePeriod('Custom');
+                      }}
+                      style={{
+                        padding: '2px 4px',
+                        border: `1px solid ${COLORS.border}`,
+                        background: COLORS.bgSecondary,
+                        color: COLORS.textPrimary,
+                        fontSize: '9px',
+                        borderRadius: '2px',
+                        fontFamily: "'Consolas', monospace",
+                      }}
+                    />
+                  </div>
                 </div>
               }
             >
