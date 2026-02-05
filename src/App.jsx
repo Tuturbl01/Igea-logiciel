@@ -330,6 +330,33 @@ const CENTRAL_BANKS = {
     unemployment: 3.7,
     gdp: 2.4,
     balanceSheet: 7840,
+    history: [
+      { date: '2022-01', rate: 0.25 },
+      { date: '2022-03', rate: 0.50 },
+      { date: '2022-05', rate: 1.00 },
+      { date: '2022-07', rate: 2.50 },
+      { date: '2022-09', rate: 3.25 },
+      { date: '2022-11', rate: 4.00 },
+      { date: '2023-01', rate: 4.50 },
+      { date: '2023-03', rate: 5.00 },
+      { date: '2023-05', rate: 5.25 },
+      { date: '2023-07', rate: 5.50 },
+      { date: '2023-09', rate: 5.50 },
+      { date: '2023-11', rate: 5.50 },
+      { date: '2024-01', rate: 5.50 },
+      { date: '2024-03', rate: 5.50 },
+      { date: '2024-05', rate: 5.50 },
+      { date: '2024-07', rate: 5.50 },
+      { date: '2024-09', rate: 5.50 },
+      { date: '2024-11', rate: 5.50 },
+      { date: '2025-01', rate: 5.50 },
+      { date: '2025-03', rate: 5.50 },
+      { date: '2025-05', rate: 5.50 },
+      { date: '2025-07', rate: 5.50 },
+      { date: '2025-09', rate: 5.50 },
+      { date: '2025-11', rate: 5.50 },
+      { date: '2026-01', rate: 5.50 },
+    ],
   },
   ECB: {
     name: 'European Central Bank',
@@ -341,6 +368,33 @@ const CENTRAL_BANKS = {
     unemployment: 6.5,
     gdp: 0.5,
     balanceSheet: 6920,
+    history: [
+      { date: '2022-01', rate: 0.00 },
+      { date: '2022-03', rate: 0.00 },
+      { date: '2022-05', rate: 0.00 },
+      { date: '2022-07', rate: 0.50 },
+      { date: '2022-09', rate: 1.25 },
+      { date: '2022-11', rate: 2.00 },
+      { date: '2023-01', rate: 2.50 },
+      { date: '2023-03', rate: 3.50 },
+      { date: '2023-05', rate: 3.75 },
+      { date: '2023-07', rate: 4.25 },
+      { date: '2023-09', rate: 4.50 },
+      { date: '2023-11', rate: 4.50 },
+      { date: '2024-01', rate: 4.50 },
+      { date: '2024-03', rate: 4.50 },
+      { date: '2024-05', rate: 4.50 },
+      { date: '2024-07', rate: 4.50 },
+      { date: '2024-09', rate: 4.50 },
+      { date: '2024-11', rate: 4.50 },
+      { date: '2025-01', rate: 4.50 },
+      { date: '2025-03', rate: 4.50 },
+      { date: '2025-05', rate: 4.50 },
+      { date: '2025-07', rate: 4.50 },
+      { date: '2025-09', rate: 4.50 },
+      { date: '2025-11', rate: 4.50 },
+      { date: '2026-01', rate: 4.50 },
+    ],
   },
   BOE: {
     name: 'Bank of England',
@@ -352,6 +406,33 @@ const CENTRAL_BANKS = {
     unemployment: 4.2,
     gdp: 0.3,
     balanceSheet: 880,
+    history: [
+      { date: '2022-01', rate: 0.25 },
+      { date: '2022-03', rate: 0.75 },
+      { date: '2022-05', rate: 1.00 },
+      { date: '2022-07', rate: 1.75 },
+      { date: '2022-09', rate: 2.25 },
+      { date: '2022-11', rate: 3.00 },
+      { date: '2023-01', rate: 4.00 },
+      { date: '2023-03', rate: 4.25 },
+      { date: '2023-05', rate: 4.50 },
+      { date: '2023-07', rate: 5.25 },
+      { date: '2023-09', rate: 5.25 },
+      { date: '2023-11', rate: 5.25 },
+      { date: '2024-01', rate: 5.25 },
+      { date: '2024-03', rate: 5.25 },
+      { date: '2024-05', rate: 5.25 },
+      { date: '2024-07', rate: 5.25 },
+      { date: '2024-09', rate: 5.25 },
+      { date: '2024-11', rate: 5.25 },
+      { date: '2025-01', rate: 5.25 },
+      { date: '2025-03', rate: 5.25 },
+      { date: '2025-05', rate: 5.25 },
+      { date: '2025-07', rate: 5.25 },
+      { date: '2025-09', rate: 5.25 },
+      { date: '2025-11', rate: 5.25 },
+      { date: '2026-01', rate: 5.25 },
+    ],
   },
   BOJ: {
     name: 'Bank of Japan',
@@ -363,6 +444,33 @@ const CENTRAL_BANKS = {
     unemployment: 2.5,
     gdp: 1.2,
     balanceSheet: 5840,
+    history: [
+      { date: '2022-01', rate: -0.10 },
+      { date: '2022-03', rate: -0.10 },
+      { date: '2022-05', rate: -0.10 },
+      { date: '2022-07', rate: -0.10 },
+      { date: '2022-09', rate: -0.10 },
+      { date: '2022-11', rate: -0.10 },
+      { date: '2023-01', rate: -0.10 },
+      { date: '2023-03', rate: -0.10 },
+      { date: '2023-05', rate: -0.10 },
+      { date: '2023-07', rate: -0.10 },
+      { date: '2023-09', rate: -0.10 },
+      { date: '2023-11', rate: -0.10 },
+      { date: '2024-01', rate: -0.10 },
+      { date: '2024-03', rate: 0.00 },
+      { date: '2024-05', rate: 0.10 },
+      { date: '2024-07', rate: 0.10 },
+      { date: '2024-09', rate: 0.10 },
+      { date: '2024-11', rate: 0.10 },
+      { date: '2025-01', rate: 0.10 },
+      { date: '2025-03', rate: 0.10 },
+      { date: '2025-05', rate: 0.10 },
+      { date: '2025-07', rate: 0.10 },
+      { date: '2025-09', rate: 0.10 },
+      { date: '2025-11', rate: 0.10 },
+      { date: '2026-01', rate: 0.10 },
+    ],
   },
   BOC: {
     name: 'Bank of Canada',
@@ -374,6 +482,33 @@ const CENTRAL_BANKS = {
     unemployment: 5.8,
     gdp: 1.1,
     balanceSheet: 280,
+    history: [
+      { date: '2022-01', rate: 0.25 },
+      { date: '2022-03', rate: 0.50 },
+      { date: '2022-05', rate: 1.50 },
+      { date: '2022-07', rate: 2.50 },
+      { date: '2022-09', rate: 3.25 },
+      { date: '2022-11', rate: 4.25 },
+      { date: '2023-01', rate: 4.50 },
+      { date: '2023-03', rate: 4.75 },
+      { date: '2023-05', rate: 5.00 },
+      { date: '2023-07', rate: 5.00 },
+      { date: '2023-09', rate: 5.00 },
+      { date: '2023-11', rate: 5.00 },
+      { date: '2024-01', rate: 5.00 },
+      { date: '2024-03', rate: 5.00 },
+      { date: '2024-05', rate: 5.00 },
+      { date: '2024-07', rate: 5.00 },
+      { date: '2024-09', rate: 5.00 },
+      { date: '2024-11', rate: 5.00 },
+      { date: '2025-01', rate: 5.00 },
+      { date: '2025-03', rate: 5.00 },
+      { date: '2025-05', rate: 5.00 },
+      { date: '2025-07', rate: 5.00 },
+      { date: '2025-09', rate: 5.00 },
+      { date: '2025-11', rate: 5.00 },
+      { date: '2026-01', rate: 5.00 },
+    ],
   },
   RBA: {
     name: 'Reserve Bank of Australia',
@@ -385,6 +520,33 @@ const CENTRAL_BANKS = {
     unemployment: 3.9,
     gdp: 1.5,
     balanceSheet: 380,
+    history: [
+      { date: '2022-01', rate: 0.10 },
+      { date: '2022-03', rate: 0.10 },
+      { date: '2022-05', rate: 0.35 },
+      { date: '2022-07', rate: 1.35 },
+      { date: '2022-09', rate: 2.35 },
+      { date: '2022-11', rate: 2.85 },
+      { date: '2023-01', rate: 3.35 },
+      { date: '2023-03', rate: 3.60 },
+      { date: '2023-05', rate: 3.85 },
+      { date: '2023-07', rate: 4.10 },
+      { date: '2023-09', rate: 4.10 },
+      { date: '2023-11', rate: 4.35 },
+      { date: '2024-01', rate: 4.35 },
+      { date: '2024-03', rate: 4.35 },
+      { date: '2024-05', rate: 4.35 },
+      { date: '2024-07', rate: 4.35 },
+      { date: '2024-09', rate: 4.35 },
+      { date: '2024-11', rate: 4.35 },
+      { date: '2025-01', rate: 4.35 },
+      { date: '2025-03', rate: 4.35 },
+      { date: '2025-05', rate: 4.35 },
+      { date: '2025-07', rate: 4.35 },
+      { date: '2025-09', rate: 4.35 },
+      { date: '2025-11', rate: 4.35 },
+      { date: '2026-01', rate: 4.35 },
+    ],
   },
   SNB: {
     name: 'Swiss National Bank',
@@ -396,6 +558,33 @@ const CENTRAL_BANKS = {
     unemployment: 2.1,
     gdp: 1.3,
     balanceSheet: 720,
+    history: [
+      { date: '2022-01', rate: -0.75 },
+      { date: '2022-03', rate: -0.75 },
+      { date: '2022-05', rate: -0.75 },
+      { date: '2022-07', rate: -0.25 },
+      { date: '2022-09', rate: 0.50 },
+      { date: '2022-11', rate: 1.00 },
+      { date: '2023-01', rate: 1.00 },
+      { date: '2023-03', rate: 1.50 },
+      { date: '2023-05', rate: 1.50 },
+      { date: '2023-07', rate: 1.75 },
+      { date: '2023-09', rate: 1.75 },
+      { date: '2023-11', rate: 1.75 },
+      { date: '2024-01', rate: 1.75 },
+      { date: '2024-03', rate: 1.75 },
+      { date: '2024-05', rate: 1.75 },
+      { date: '2024-07', rate: 1.75 },
+      { date: '2024-09', rate: 1.75 },
+      { date: '2024-11', rate: 1.75 },
+      { date: '2025-01', rate: 1.75 },
+      { date: '2025-03', rate: 1.75 },
+      { date: '2025-05', rate: 1.75 },
+      { date: '2025-07', rate: 1.75 },
+      { date: '2025-09', rate: 1.75 },
+      { date: '2025-11', rate: 1.75 },
+      { date: '2026-01', rate: 1.75 },
+    ],
   },
   PBOC: {
     name: "People's Bank of China",
@@ -407,6 +596,33 @@ const CENTRAL_BANKS = {
     unemployment: 5.2,
     gdp: 5.2,
     balanceSheet: 5420,
+    history: [
+      { date: '2022-01', rate: 3.70 },
+      { date: '2022-03', rate: 3.70 },
+      { date: '2022-05', rate: 3.70 },
+      { date: '2022-07', rate: 3.65 },
+      { date: '2022-09', rate: 3.65 },
+      { date: '2022-11', rate: 3.65 },
+      { date: '2023-01', rate: 3.65 },
+      { date: '2023-03', rate: 3.65 },
+      { date: '2023-05', rate: 3.55 },
+      { date: '2023-07', rate: 3.45 },
+      { date: '2023-09', rate: 3.45 },
+      { date: '2023-11', rate: 3.45 },
+      { date: '2024-01', rate: 3.45 },
+      { date: '2024-03', rate: 3.45 },
+      { date: '2024-05', rate: 3.45 },
+      { date: '2024-07', rate: 3.45 },
+      { date: '2024-09', rate: 3.45 },
+      { date: '2024-11', rate: 3.45 },
+      { date: '2025-01', rate: 3.45 },
+      { date: '2025-03', rate: 3.45 },
+      { date: '2025-05', rate: 3.45 },
+      { date: '2025-07', rate: 3.45 },
+      { date: '2025-09', rate: 3.45 },
+      { date: '2025-11', rate: 3.45 },
+      { date: '2026-01', rate: 3.45 },
+    ],
   },
 };
 
@@ -680,81 +896,81 @@ const GOOGLE_TRENDS = [
   {
     week: 'W1',
     date: 'Jan 7',
-    Inflation: 72,
-    Recession: 45,
-    'Fed Rate': 68,
-    Bitcoin: 54,
-    'AI Stocks': 89,
+    'Stock Market': 72,
+    'Federal Reserve': 45,
+    'Inflation News': 68,
+    'Cryptocurrency': 54,
+    'NVIDIA Stock': 89,
     'Interest Rates': 62,
   },
   {
     week: 'W2',
     date: 'Jan 14',
-    Inflation: 68,
-    Recession: 52,
-    'Fed Rate': 71,
-    Bitcoin: 61,
-    'AI Stocks': 92,
+    'Stock Market': 68,
+    'Federal Reserve': 52,
+    'Inflation News': 71,
+    'Cryptocurrency': 61,
+    'NVIDIA Stock': 92,
     'Interest Rates': 65,
   },
   {
     week: 'W3',
     date: 'Jan 21',
-    Inflation: 65,
-    Recession: 48,
-    'Fed Rate': 65,
-    Bitcoin: 78,
-    'AI Stocks': 95,
+    'Stock Market': 65,
+    'Federal Reserve': 48,
+    'Inflation News': 65,
+    'Cryptocurrency': 78,
+    'NVIDIA Stock': 95,
     'Interest Rates': 58,
   },
   {
     week: 'W4',
     date: 'Jan 28',
-    Inflation: 58,
-    Recession: 42,
-    'Fed Rate': 58,
-    Bitcoin: 82,
-    'AI Stocks': 88,
+    'Stock Market': 58,
+    'Federal Reserve': 42,
+    'Inflation News': 58,
+    'Cryptocurrency': 82,
+    'NVIDIA Stock': 88,
     'Interest Rates': 52,
   },
   {
     week: 'W5',
     date: 'Feb 4',
-    Inflation: 52,
-    Recession: 38,
-    'Fed Rate': 62,
-    Bitcoin: 71,
-    'AI Stocks': 91,
+    'Stock Market': 52,
+    'Federal Reserve': 38,
+    'Inflation News': 62,
+    'Cryptocurrency': 71,
+    'NVIDIA Stock': 91,
     'Interest Rates': 55,
   },
   {
     week: 'W6',
     date: 'Feb 11',
-    Inflation: 48,
-    Recession: 35,
-    'Fed Rate': 75,
-    Bitcoin: 65,
-    'AI Stocks': 100,
+    'Stock Market': 48,
+    'Federal Reserve': 35,
+    'Inflation News': 75,
+    'Cryptocurrency': 65,
+    'NVIDIA Stock': 100,
     'Interest Rates': 68,
   },
   {
     week: 'W7',
     date: 'Feb 18',
-    Inflation: 45,
-    Recession: 32,
-    'Fed Rate': 68,
-    Bitcoin: 72,
-    'AI Stocks': 97,
+    'Stock Market': 45,
+    'Federal Reserve': 32,
+    'Inflation News': 68,
+    'Cryptocurrency': 72,
+    'NVIDIA Stock': 97,
     'Interest Rates': 62,
   },
   {
     week: 'W8',
     date: 'Feb 25',
-    Inflation: 42,
-    Recession: 29,
-    'Fed Rate': 72,
-    Bitcoin: 68,
-    'AI Stocks': 94,
+    'Stock Market': 42,
+    'Federal Reserve': 29,
+    'Inflation News': 72,
+    'Cryptocurrency': 68,
+    'NVIDIA Stock': 94,
     'Interest Rates': 58,
   },
 ];
@@ -887,93 +1103,93 @@ const POLYMARKET = [
 const NEWS = [
   {
     id: 1,
-    title: 'Fed Signals Potential Rate Cut in September as Inflation Cools',
+    title: 'Federal Reserve maintains interest rates amid economic uncertainty',
     source: 'Reuters',
-    time: '12 min ago',
+    time: '2 hours ago',
     category: 'Macro',
     impact: 'high',
-    url: 'https://www.reuters.com/markets/us/fed-rate-cut-inflation-2025',
+    url: 'https://www.reuters.com/markets/us/',
   },
   {
     id: 2,
-    title: 'NVIDIA Reports Record Q4 Earnings, Data Center Revenue Surges 400%',
+    title: 'Tech stocks rally as AI spending continues to surge',
     source: 'Bloomberg',
-    time: '34 min ago',
+    time: '3 hours ago',
     category: 'Earnings',
     impact: 'high',
-    url: 'https://www.bloomberg.com/news/nvidia-earnings-q4-2025',
+    url: 'https://www.bloomberg.com/markets',
   },
   {
     id: 3,
-    title: 'ECB Holds Rates Steady, Lagarde Hints at June Cut',
+    title: 'European Central Bank signals potential policy changes',
     source: 'FT',
-    time: '1 hour ago',
+    time: '4 hours ago',
     category: 'Macro',
     impact: 'medium',
-    url: 'https://www.ft.com/content/ecb-rates-lagarde-2025',
+    url: 'https://www.ft.com/markets',
   },
   {
     id: 4,
-    title: 'Apple Announces $110B Stock Buyback Program, Largest in History',
+    title: 'Major tech companies announce share buyback programs',
     source: 'CNBC',
-    time: '2 hours ago',
+    time: '5 hours ago',
     category: 'Corporate',
     impact: 'high',
-    url: 'https://www.cnbc.com/apple-buyback-110b-2025',
+    url: 'https://www.cnbc.com/stocks/',
   },
   {
     id: 5,
-    title: 'Oil Prices Drop on Higher US Inventories Report',
+    title: 'Energy markets volatile as oil prices fluctuate',
     source: 'Reuters',
-    time: '2 hours ago',
+    time: '6 hours ago',
     category: 'Commodities',
     impact: 'medium',
-    url: 'https://www.reuters.com/markets/commodities/oil-prices-inventories-2025',
+    url: 'https://www.reuters.com/business/energy/',
   },
   {
     id: 6,
-    title: 'China Manufacturing PMI Unexpectedly Contracts in April',
+    title: 'Asian markets show mixed performance amid trade concerns',
     source: 'Bloomberg',
-    time: '3 hours ago',
+    time: '7 hours ago',
     category: 'Macro',
     impact: 'medium',
-    url: 'https://www.bloomberg.com/news/china-manufacturing-pmi-2025',
+    url: 'https://www.bloomberg.com/asia',
   },
   {
     id: 7,
-    title: 'Microsoft Azure Revenue Growth Beats Expectations',
+    title: 'Cloud computing revenue drives big tech earnings',
     source: 'WSJ',
-    time: '4 hours ago',
+    time: '8 hours ago',
     category: 'Earnings',
     impact: 'medium',
-    url: 'https://www.wsj.com/articles/microsoft-azure-revenue-2025',
+    url: 'https://www.wsj.com/tech',
   },
   {
     id: 8,
-    title: 'Bitcoin ETFs See $500M Inflows, Largest Single Day in 2024',
+    title: 'Cryptocurrency markets see increased institutional interest',
     source: 'CoinDesk',
-    time: '5 hours ago',
+    time: '9 hours ago',
     category: 'Crypto',
     impact: 'medium',
-    url: 'https://www.coindesk.com/markets/bitcoin-etf-inflows-2025',
+    url: 'https://www.coindesk.com/markets/',
   },
   {
     id: 9,
-    title: 'Tesla Recalls 2M Vehicles Over Autopilot Safety Concerns',
+    title: 'Automotive industry faces regulatory challenges',
     source: 'Reuters',
-    time: '6 hours ago',
+    time: '10 hours ago',
     category: 'Corporate',
     impact: 'high',
-    url: 'https://www.reuters.com/business/autos-transportation/tesla-recall-autopilot-2025',
+    url: 'https://www.reuters.com/business/autos-transportation/',
   },
   {
     id: 10,
-    title: 'Bank of Japan Hints at Further Yen Intervention',
+    title: 'Currency markets react to central bank policies',
     source: 'Nikkei',
-    time: '7 hours ago',
+    time: '11 hours ago',
     category: 'Forex',
     impact: 'medium',
-    url: 'https://asia.nikkei.com/Economy/Bank-of-Japan-yen-intervention-2025',
+    url: 'https://asia.nikkei.com/Economy',
   },
 ];
 
@@ -1399,6 +1615,7 @@ export default function IgeaOmnisPro() {
   const [selectedIndex, setSelectedIndex] = useState('SPX');
   const [selectedForex, setSelectedForex] = useState('EURUSD');
   const [selectedStock, setSelectedStock] = useState('AAPL');
+  const [selectedCentralBank, setSelectedCentralBank] = useState('FED');
   const [forexCategory, setForexCategory] = useState('All');
   const [compareAssets, setCompareAssets] = useState(['SPX', 'NDX', 'BTCUSD']);
   const [comparePeriod, setComparePeriod] = useState('YTD');
@@ -2278,7 +2495,7 @@ export default function IgeaOmnisPro() {
                 ))}
               </Panel>
               <Panel title="Google Trends" noPad>
-                {['AI Stocks', 'Fed Rate', 'Bitcoin', 'Inflation'].map((kw) => {
+                {['NVIDIA Stock', 'Inflation News', 'Cryptocurrency', 'Stock Market'].map((kw) => {
                   const curr = GOOGLE_TRENDS[GOOGLE_TRENDS.length - 1][kw];
                   const prev = GOOGLE_TRENDS[0][kw];
                   const chg = curr - prev;
@@ -3558,12 +3775,18 @@ export default function IgeaOmnisPro() {
                     gap: '4px',
                     alignItems: 'center',
                     cursor: 'pointer',
+                    background: selectedCentralBank === code ? COLORS.bgSecondary : 'transparent',
                   }}
+                  onClick={() => setSelectedCentralBank(code)}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = COLORS.bgSecondary;
+                    if (selectedCentralBank !== code) {
+                      e.currentTarget.style.background = COLORS.bgSecondary;
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
+                    if (selectedCentralBank !== code) {
+                      e.currentTarget.style.background = 'transparent';
+                    }
                   }}
                 >
                   <span
@@ -3743,6 +3966,50 @@ export default function IgeaOmnisPro() {
               </Panel>
             </div>
           </div>
+          
+          {/* Historical Interest Rates Chart */}
+          <div style={{ marginTop: '12px' }}>
+            <Panel title={`${selectedCentralBank} — ${CENTRAL_BANKS[selectedCentralBank]?.name} — Historical Interest Rates`}>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={CENTRAL_BANKS[selectedCentralBank]?.history || []}>
+                  <CartesianGrid strokeDasharray="1 1" stroke={COLORS.borderLight} />
+                  <XAxis
+                    dataKey="date"
+                    stroke={COLORS.textMuted}
+                    fontSize={9}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    stroke={COLORS.textMuted}
+                    fontSize={9}
+                    tickLine={false}
+                    domain={['auto', 'auto']}
+                    tickFormatter={(v) => `${v.toFixed(2)}%`}
+                  />
+                  <Tooltip content={<Tooltip2 />} />
+                  <Line
+                    type="monotone"
+                    dataKey="rate"
+                    stroke={COLORS.primary}
+                    strokeWidth={3}
+                    dot={{ fill: COLORS.primary, r: 3 }}
+                    name="Interest Rate (%)"
+                  />
+                  <ReferenceLine
+                    y={CENTRAL_BANKS[selectedCentralBank]?.rate}
+                    stroke={COLORS.primary}
+                    strokeDasharray="3 3"
+                    label={{ 
+                      value: `Current: ${CENTRAL_BANKS[selectedCentralBank]?.rate.toFixed(2)}%`, 
+                      position: 'right',
+                      fill: COLORS.primary,
+                      fontSize: 10,
+                    }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </Panel>
+          </div>
         )}
 
         {/* ==================== TRENDS ==================== */}
@@ -3805,35 +4072,35 @@ export default function IgeaOmnisPro() {
                   <Legend wrapperStyle={{ fontSize: '10px' }} />
                   <Line
                     type="monotone"
-                    dataKey="AI Stocks"
+                    dataKey="NVIDIA Stock"
                     stroke={COLORS.chart5}
                     strokeWidth={2}
                     dot={false}
                   />
                   <Line
                     type="monotone"
-                    dataKey="Fed Rate"
+                    dataKey="Inflation News"
                     stroke={COLORS.chart1}
                     strokeWidth={2}
                     dot={false}
                   />
                   <Line
                     type="monotone"
-                    dataKey="Bitcoin"
+                    dataKey="Cryptocurrency"
                     stroke={COLORS.chart4}
                     strokeWidth={2}
                     dot={false}
                   />
                   <Line
                     type="monotone"
-                    dataKey="Inflation"
+                    dataKey="Stock Market"
                     stroke={COLORS.chart3}
                     strokeWidth={2}
                     dot={false}
                   />
                   <Line
                     type="monotone"
-                    dataKey="Recession"
+                    dataKey="Federal Reserve"
                     stroke={COLORS.chart6}
                     strokeWidth={2}
                     dot={false}
@@ -3859,11 +4126,11 @@ export default function IgeaOmnisPro() {
                 <span style={{ textAlign: 'right' }}>Δ 8W</span>
               </div>
               {[
-                'AI Stocks',
-                'Fed Rate',
-                'Bitcoin',
-                'Inflation',
-                'Recession',
+                'NVIDIA Stock',
+                'Inflation News',
+                'Cryptocurrency',
+                'Stock Market',
+                'Federal Reserve',
                 'Interest Rates',
               ].map((kw) => {
                 const curr = GOOGLE_TRENDS[GOOGLE_TRENDS.length - 1][kw];
