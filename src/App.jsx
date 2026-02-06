@@ -43,6 +43,31 @@ import {
 } from 'lucide-react';
 
 // ============================================================================
+// FMP API CONFIGURATION
+// ============================================================================
+const API_KEY = '6HC5r0WZ2ZAMpLbS5xu27Hj9Xa81XkDY';
+const FMP_BASE_URL = 'https://financialmodelingprep.com/api/v3';
+
+// FMP API utility functions
+const fetchFMP = async (endpoint, params = {}) => {
+  const queryParams = new URLSearchParams({
+    apikey: API_KEY,
+    ...params,
+  });
+  
+  try {
+    const response = await fetch(`${FMP_BASE_URL}${endpoint}?${queryParams}`);
+    if (!response.ok) {
+      throw new Error(`FMP API Error: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('FMP API Error:', error);
+    throw error;
+  }
+};
+
+// ============================================================================
 // DESIGN SYSTEM - Corporate Blue Theme
 // ============================================================================
 const COLORS = {
@@ -1640,6 +1665,33 @@ export default function IgeaOmnisPro() {
   const [researchPeriod, setResearchPeriod] = useState('1Y');
 
   // ============================================================================
+  // FMP API STATE
+  // ============================================================================
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [selectedSearchResult, setSelectedSearchResult] = useState(null);
+  const [realTimeQuote, setRealTimeQuote] = useState(null);
+  const [historicalData, setHistoricalData] = useState([]);
+  const [financialStatements, setFinancialStatements] = useState({
+    incomeStatement: [],
+    balanceSheet: [],
+    cashFlow: [],
+  });
+  const [selectedFinancialRows, setSelectedFinancialRows] = useState({
+    revenue: true,
+    netIncome: true,
+    ebitda: true,
+    totalDebt: true,
+    totalAssets: true,
+    operatingCashFlow: true,
+  });
+  const [assetColors, setAssetColors] = useState({});
+  const [showNormalized, setShowNormalized] = useState(false);
+  const [showCorrelation, setShowCorrelation] = useState(false);
+
+  // ============================================================================
   // DYNAMIC MARKET DATA STATE
   // ============================================================================
   const [indices, setIndices] = useState(INITIAL_INDICES);
@@ -1657,26 +1709,116 @@ export default function IgeaOmnisPro() {
   const STOCKS = stocks;
 
   // ============================================================================
-  // API INTEGRATION PLACEHOLDER
+  // FMP API FUNCTIONS
   // ============================================================================
-  const fetchMarketData = async () => {
-    // TODO: Replace with actual API calls
-    // Example structure for future implementation:
-    /*
-    try {
-      const response = await fetch('YOUR_API_ENDPOINT');
-      const data = await response.json();
-      
-      setIndices(data.indices);
-      setForex(data.forex);
-      setCrypto(data.crypto);
-      setCommodities(data.commodities);
-      setStocks(data.stocks);
-    } catch (error) {
-      console.error('Error fetching market data:', error);
+  
+  // Search for companies
+  const searchCompanies = async (query) => {
+    if (!query || query.length < 2) {
+      setSearchResults([]);
+      return;
     }
-    */
-    console.log('fetchMarketData: Ready for API integration');
+    
+    setSearchLoading(true);
+    setApiError(null);
+    
+    try {
+      const data = await fetchFMP('/search', { query, limit: 10 });
+      setSearchResults(data || []);
+    } catch (error) {
+      setApiError('Failed to search companies');
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  // Get real-time quote
+  const getRealTimeQuote = async (symbol) => {
+    setIsLoading(true);
+    setApiError(null);
+    
+    try {
+      const data = await fetchFMP(`/quote/${symbol}`);
+      if (data && data.length > 0) {
+        setRealTimeQuote(data[0]);
+        return data[0];
+      }
+    } catch (error) {
+      setApiError('Failed to fetch quote');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Get historical price data
+  const getHistoricalData = async (symbol, from = null, to = null) => {
+    setIsLoading(true);
+    setApiError(null);
+    
+    try {
+      const params = {};
+      if (from) params.from = from;
+      if (to) params.to = to;
+      
+      const data = await fetchFMP(`/historical-price-full/${symbol}`, params);
+      
+      if (data && data.historical) {
+        const formatted = data.historical.map(item => ({
+          date: new Date(item.date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          }),
+          fullDate: item.date,
+          price: item.close,
+          close: item.close,
+          volume: item.volume,
+        })).reverse();
+        
+        setHistoricalData(formatted);
+        return formatted;
+      }
+    } catch (error) {
+      setApiError('Failed to fetch historical data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Get financial statements
+  const getFinancialStatements = async (symbol) => {
+    setIsLoading(true);
+    setApiError(null);
+    
+    try {
+      const [income, balance, cashFlow] = await Promise.all([
+        fetchFMP(`/income-statement/${symbol}`, { limit: 5 }),
+        fetchFMP(`/balance-sheet-statement/${symbol}`, { limit: 5 }),
+        fetchFMP(`/cash-flow-statement/${symbol}`, { limit: 5 }),
+      ]);
+      
+      setFinancialStatements({
+        incomeStatement: income || [],
+        balanceSheet: balance || [],
+        cashFlow: cashFlow || [],
+      });
+      
+      return { income, balance, cashFlow };
+    } catch (error) {
+      setApiError('Failed to fetch financial statements');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle search result selection
+  const handleSearchResultClick = async (result) => {
+    setSelectedSearchResult(result);
+    setSearchResults([]);
+    
+    // Fetch quote and historical data
+    await getRealTimeQuote(result.symbol);
+    await getHistoricalData(result.symbol);
   };
 
   // ============================================================================
@@ -1995,6 +2137,176 @@ export default function IgeaOmnisPro() {
         allAssets[ticker]?.name?.toUpperCase().includes(query)
       )
       .slice(0, 5);
+  };
+
+  // ============================================================================
+  // CORRELATION MATRIX CALCULATION
+  // ============================================================================
+  const calculateCorrelationMatrix = (assets) => {
+    if (assets.length < 2) return [];
+    
+    // Get price series for each asset
+    const series = {};
+    assets.forEach(ticker => {
+      const asset = allAssets[ticker];
+      if (asset && asset.history) {
+        series[ticker] = asset.history.map(h => h.price);
+      }
+    });
+    
+    // Calculate Pearson correlation
+    const correlate = (x, y) => {
+      const n = Math.min(x.length, y.length);
+      const xSlice = x.slice(-n);
+      const ySlice = y.slice(-n);
+      
+      const meanX = xSlice.reduce((a, b) => a + b, 0) / n;
+      const meanY = ySlice.reduce((a, b) => a + b, 0) / n;
+      
+      let num = 0, denX = 0, denY = 0;
+      for (let i = 0; i < n; i++) {
+        const dx = xSlice[i] - meanX;
+        const dy = ySlice[i] - meanY;
+        num += dx * dy;
+        denX += dx * dx;
+        denY += dy * dy;
+      }
+      
+      return denX === 0 || denY === 0 ? 0 : num / Math.sqrt(denX * denY);
+    };
+    
+    // Build correlation matrix
+    const matrix = [];
+    assets.forEach((ticker1, i) => {
+      const row = { asset: ticker1 };
+      assets.forEach((ticker2, j) => {
+        if (series[ticker1] && series[ticker2]) {
+          row[ticker2] = correlate(series[ticker1], series[ticker2]);
+        } else {
+          row[ticker2] = i === j ? 1 : 0;
+        }
+      });
+      matrix.push(row);
+    });
+    
+    return matrix;
+  };
+
+  // ============================================================================
+  // CHART EXPORT TO PNG
+  // ============================================================================
+  const exportChartToPNG = (chartRef, filename = 'chart') => {
+    if (!chartRef || !chartRef.current) {
+      console.error('Chart reference not found');
+      return;
+    }
+    
+    // Create a canvas from the SVG
+    const svgElement = chartRef.current.querySelector('svg');
+    if (!svgElement) {
+      console.error('SVG element not found');
+      return;
+    }
+    
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    canvas.width = svgElement.clientWidth || 800;
+    canvas.height = svgElement.clientHeight || 400;
+    
+    img.onload = () => {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      
+      const pngUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `${filename}_${new Date().toISOString().split('T')[0]}.png`;
+      link.href = pngUrl;
+      link.click();
+    };
+    
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+  };
+
+  // ============================================================================
+  // EXPORT FINANCIAL STATEMENTS
+  // ============================================================================
+  const exportFinancialData = () => {
+    if (!financialStatements.incomeStatement.length) return;
+    
+    const headers = ['Metric'];
+    const rows = [];
+    
+    // Add years as columns
+    financialStatements.incomeStatement.forEach((stmt, i) => {
+      headers.push(stmt.date || `Year ${i + 1}`);
+    });
+    
+    // Selected rows based on checkboxes
+    if (selectedFinancialRows.revenue && financialStatements.incomeStatement.length > 0) {
+      const revenueRow = ['Revenue'];
+      financialStatements.incomeStatement.forEach(stmt => {
+        revenueRow.push(stmt.revenue || 0);
+      });
+      rows.push(revenueRow);
+    }
+    
+    if (selectedFinancialRows.netIncome && financialStatements.incomeStatement.length > 0) {
+      const netIncomeRow = ['Net Income'];
+      financialStatements.incomeStatement.forEach(stmt => {
+        netIncomeRow.push(stmt.netIncome || 0);
+      });
+      rows.push(netIncomeRow);
+    }
+    
+    if (selectedFinancialRows.ebitda && financialStatements.incomeStatement.length > 0) {
+      const ebitdaRow = ['EBITDA'];
+      financialStatements.incomeStatement.forEach(stmt => {
+        ebitdaRow.push(stmt.ebitda || 0);
+      });
+      rows.push(ebitdaRow);
+    }
+    
+    if (selectedFinancialRows.totalDebt && financialStatements.balanceSheet.length > 0) {
+      const debtRow = ['Total Debt'];
+      financialStatements.balanceSheet.forEach(stmt => {
+        debtRow.push(stmt.totalDebt || 0);
+      });
+      rows.push(debtRow);
+    }
+    
+    if (selectedFinancialRows.totalAssets && financialStatements.balanceSheet.length > 0) {
+      const assetsRow = ['Total Assets'];
+      financialStatements.balanceSheet.forEach(stmt => {
+        assetsRow.push(stmt.totalAssets || 0);
+      });
+      rows.push(assetsRow);
+    }
+    
+    if (selectedFinancialRows.operatingCashFlow && financialStatements.cashFlow.length > 0) {
+      const cashFlowRow = ['Operating Cash Flow'];
+      financialStatements.cashFlow.forEach(stmt => {
+        cashFlowRow.push(stmt.operatingCashFlow || 0);
+      });
+      rows.push(cashFlowRow);
+    }
+    
+    // Convert to CSV
+    const csv = [
+      headers.join(','),
+      ...rows.map(row => row.join(',')),
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `financial_statements_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   // Filter predictions to only future events
