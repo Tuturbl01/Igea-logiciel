@@ -4862,156 +4862,279 @@ export default function IgeaOmnisPro() {
               gap: '12px',
             }}
           >
-            <Panel title="Global Indices" noPad>
-              <div
-                style={{
-                  fontSize: '8px',
-                  color: COLORS.textMuted,
-                  padding: '4px 10px',
-                  background: COLORS.bgSecondary,
-                  display: 'grid',
-                  gridTemplateColumns: '60px 1fr 70px 60px',
-                  gap: '4px',
-                }}
-              >
-                <span>TICKER</span>
-                <span>NAME</span>
-                <span style={{ textAlign: 'right' }}>LAST</span>
-                <span style={{ textAlign: 'right' }}>CHG %</span>
-              </div>
-              {Object.entries(INDICES).map(([t, d]) => (
-                <AssetRow
-                  key={t}
-                  ticker={t}
-                  data={d}
-                  isSelected={selectedIndex === t}
-                  onClick={() => setSelectedIndex(t)}
-                />
-              ))}
-            </Panel>
-            <Panel title={`${selectedIndex} — ${INDICES[selectedIndex]?.name}`}>
-              <div style={{ marginBottom: '12px' }}>
-                <span
-                  style={{
-                    fontSize: '24px',
-                    fontWeight: 700,
-                    fontFamily: "'Consolas', monospace",
-                  }}
-                >
-                  {fmt(INDICES[selectedIndex]?.price, 2)}
-                </span>
-                <span
-                  style={{
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    fontFamily: "'Consolas', monospace",
-                    marginLeft: '12px',
-                    color:
-                      INDICES[selectedIndex]?.change >= 0
-                        ? COLORS.positive
-                        : COLORS.negative,
-                  }}
-                >
-                  {fmtChg(INDICES[selectedIndex]?.change)}
-                </span>
-              </div>
-              <div style={{ marginBottom: '16px' }}>
-                <div
-                  style={{
-                    fontSize: '9px',
-                    fontWeight: 700,
-                    color: COLORS.textTertiary,
-                    marginBottom: '8px',
-                  }}
-                >
-                  PERIOD RETURNS
+            <Panel title="Search Companies" noPad>
+              {/* Search Bar */}
+              <div style={{ padding: '12px', background: COLORS.bgSecondary }}>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    placeholder="Search by company name or ticker..."
+                    value={compareInput}
+                    onChange={(e) => {
+                      setCompareInput(e.target.value);
+                      searchCompanies(e.target.value);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '8px 32px 8px 12px',
+                      border: `1px solid ${COLORS.border}`,
+                      borderRadius: '4px',
+                      fontSize: '13px',
+                      fontFamily: 'inherit',
+                    }}
+                  />
+                  <Search
+                    size={16}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: COLORS.textMuted,
+                    }}
+                  />
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  {['1D', '1W', '1M', '3M', 'YTD', '1Y'].map((p) => {
-                    const ret = calculatePeriodReturn(
-                      INDICES[selectedIndex]?.history,
-                      p
-                    );
-                    return (
-                      <div
-                        key={p}
+                {searchLoading && (
+                  <div style={{ padding: '8px', fontSize: '12px', color: COLORS.textMuted }}>
+                    Searching...
+                  </div>
+                )}
+                {apiError && (
+                  <div style={{ padding: '8px', fontSize: '12px', color: COLORS.negative }}>
+                    {apiError}
+                  </div>
+                )}
+              </div>
+
+              {/* Search Results */}
+              {searchResults.length > 0 && (
+                <div>
+                  <div
+                    style={{
+                      fontSize: '8px',
+                      color: COLORS.textMuted,
+                      padding: '4px 10px',
+                      background: COLORS.bgSecondary,
+                      display: 'grid',
+                      gridTemplateColumns: '60px 1fr 80px',
+                      gap: '4px',
+                    }}
+                  >
+                    <span>SYMBOL</span>
+                    <span>NAME</span>
+                    <span>EXCHANGE</span>
+                  </div>
+                  {searchResults.map((result) => (
+                    <div
+                      key={result.symbol}
+                      onClick={() => handleSearchResultClick(result)}
+                      style={{
+                        padding: '10px',
+                        display: 'grid',
+                        gridTemplateColumns: '60px 1fr 80px',
+                        gap: '4px',
+                        alignItems: 'center',
+                        borderBottom: `1px solid ${COLORS.borderLight}`,
+                        cursor: 'pointer',
+                        transition: 'background 0.15s',
+                        background: selectedSearchResult?.symbol === result.symbol ? COLORS.primaryLight + '20' : 'transparent',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = COLORS.bgSecondary)}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = selectedSearchResult?.symbol === result.symbol ? COLORS.primaryLight + '20' : 'transparent')}
+                    >
+                      <span
                         style={{
-                          flex: 1,
-                          padding: '8px',
-                          background: COLORS.bgSecondary,
-                          borderRadius: '4px',
-                          textAlign: 'center',
+                          fontWeight: 700,
+                          fontSize: '11px',
+                          fontFamily: "'Consolas', monospace",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: '9px',
-                            color: COLORS.textMuted,
-                            marginBottom: '4px',
-                          }}
-                        >
-                          {p}
-                        </div>
-                        <div
-                          style={{
-                            fontFamily: "'Consolas', monospace",
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            color: ret >= 0 ? COLORS.positive : COLORS.negative,
-                          }}
-                        >
-                          {fmtChg(ret)}
-                        </div>
-                      </div>
-                    );
-                  })}
+                        {result.symbol}
+                      </span>
+                      <span style={{ fontSize: '11px', color: COLORS.textSecondary }}>
+                        {result.name}
+                      </span>
+                      <span style={{ fontSize: '9px', color: COLORS.textMuted }}>
+                        {result.exchangeShortName || result.stockExchange}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              </div>
-              <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={INDICES[selectedIndex]?.history || []}>
-                  <defs>
-                    <linearGradient id="mktGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop
-                        offset="0%"
-                        stopColor={COLORS.chart2}
-                        stopOpacity={0.2}
+              )}
+
+              {/* Default view - Global Indices */}
+              {!searchResults.length && !selectedSearchResult && (
+                <div>
+                  <div
+                    style={{
+                      fontSize: '8px',
+                      color: COLORS.textMuted,
+                      padding: '4px 10px',
+                      background: COLORS.bgSecondary,
+                      display: 'grid',
+                      gridTemplateColumns: '60px 1fr 70px 60px',
+                      gap: '4px',
+                    }}
+                  >
+                    <span>TICKER</span>
+                    <span>NAME</span>
+                    <span style={{ textAlign: 'right' }}>LAST</span>
+                    <span style={{ textAlign: 'right' }}>CHG %</span>
+                  </div>
+                  {Object.entries(INDICES).map(([t, d]) => (
+                    <AssetRow
+                      key={t}
+                      ticker={t}
+                      data={d}
+                      isSelected={selectedIndex === t}
+                      onClick={() => setSelectedIndex(t)}
+                    />
+                  ))}
+                </div>
+              )}
+            </Panel>
+
+            <Panel title={selectedSearchResult ? `${selectedSearchResult.symbol} — ${selectedSearchResult.name}` : `${selectedIndex} — ${INDICES[selectedIndex]?.name}`}>
+              {isLoading && (
+                <div style={{ padding: '20px', textAlign: 'center', color: COLORS.textMuted }}>
+                  Loading data...
+                </div>
+              )}
+              
+              {!isLoading && (selectedSearchResult || !isLoading) && (
+                <>
+                  <div style={{ marginBottom: '12px' }}>
+                    <span
+                      style={{
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        fontFamily: "'Consolas', monospace",
+                      }}
+                    >
+                      {realTimeQuote ? fmt(realTimeQuote.price, 2) : fmt(INDICES[selectedIndex]?.price, 2)}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        fontFamily: "'Consolas', monospace",
+                        marginLeft: '12px',
+                        color:
+                          (realTimeQuote?.changesPercentage || INDICES[selectedIndex]?.change || 0) >= 0
+                            ? COLORS.positive
+                            : COLORS.negative,
+                      }}
+                    >
+                      {realTimeQuote ? fmtChg(realTimeQuote.changesPercentage) : fmtChg(INDICES[selectedIndex]?.change)}
+                    </span>
+                  </div>
+
+                  {realTimeQuote && (
+                    <div style={{ marginBottom: '12px', fontSize: '11px', color: COLORS.textSecondary }}>
+                      <div>Market Cap: {realTimeQuote.marketCap ? `$${(realTimeQuote.marketCap / 1e9).toFixed(2)}B` : 'N/A'}</div>
+                      <div>Volume: {realTimeQuote.volume ? realTimeQuote.volume.toLocaleString() : 'N/A'}</div>
+                      <div>PE Ratio: {realTimeQuote.pe ? realTimeQuote.pe.toFixed(2) : 'N/A'}</div>
+                    </div>
+                  )}
+
+                  <div style={{ marginBottom: '16px' }}>
+                    <div
+                      style={{
+                        fontSize: '9px',
+                        fontWeight: 700,
+                        color: COLORS.textTertiary,
+                        marginBottom: '8px',
+                      }}
+                    >
+                      PERIOD RETURNS
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {['1D', '1W', '1M', '3M', 'YTD', '1Y'].map((p) => {
+                        const historyData = historicalData.length > 0 ? historicalData : INDICES[selectedIndex]?.history;
+                        const ret = calculatePeriodReturn(historyData, p);
+                        return (
+                          <div
+                            key={p}
+                            style={{
+                              flex: 1,
+                              padding: '8px',
+                              background: COLORS.bgSecondary,
+                              borderRadius: '4px',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <div
+                              style={{
+                                fontSize: '9px',
+                                color: COLORS.textMuted,
+                                marginBottom: '4px',
+                              }}
+                            >
+                              {p}
+                            </div>
+                            <div
+                              style={{
+                                fontFamily: "'Consolas', monospace",
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                color: ret >= 0 ? COLORS.positive : COLORS.negative,
+                              }}
+                            >
+                              {fmtChg(ret)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <ResponsiveContainer width="100%" height={280}>
+                    <AreaChart data={(historicalData.length > 0 ? historicalData : INDICES[selectedIndex]?.history) || []}>
+                      <defs>
+                        <linearGradient id="mktGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop
+                            offset="0%"
+                            stopColor={COLORS.chart2}
+                            stopOpacity={0.2}
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor={COLORS.chart2}
+                            stopOpacity={0}
+                          />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid
+                        strokeDasharray="1 1"
+                        stroke={COLORS.borderLight}
                       />
-                      <stop
-                        offset="100%"
-                        stopColor={COLORS.chart2}
-                        stopOpacity={0}
+                      <XAxis
+                        dataKey="date"
+                        stroke={COLORS.textMuted}
+                        fontSize={9}
+                        tickLine={false}
+                        interval="preserveStartEnd"
                       />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="1 1"
-                    stroke={COLORS.borderLight}
-                  />
-                  <XAxis
-                    dataKey="date"
-                    stroke={COLORS.textMuted}
-                    fontSize={9}
-                    tickLine={false}
-                    interval="preserveStartEnd"
-                  />
-                  <YAxis
-                    stroke={COLORS.textMuted}
-                    fontSize={9}
-                    tickLine={false}
-                    domain={['auto', 'auto']}
-                    tickFormatter={(v) => v.toLocaleString()}
-                    width={50}
-                  />
-                  <Tooltip content={<Tooltip2 />} />
-                  <Area
-                    type="monotone"
-                    dataKey="price"
-                    stroke={COLORS.chart2}
-                    strokeWidth={2}
-                    fill="url(#mktGrad)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+                      <YAxis
+                        stroke={COLORS.textMuted}
+                        fontSize={9}
+                        tickLine={false}
+                        domain={['auto', 'auto']}
+                        tickFormatter={(v) => v.toLocaleString()}
+                        width={50}
+                      />
+                      <Tooltip content={<Tooltip2 />} />
+                      <Area
+                        type="monotone"
+                        dataKey="price"
+                        stroke={COLORS.chart2}
+                        strokeWidth={2}
+                        fill="url(#mktGrad)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </>
+              )}
             </Panel>
           </div>
         )}
@@ -5025,7 +5148,7 @@ export default function IgeaOmnisPro() {
               gap: '12px',
             }}
           >
-            <Panel title="Report Configuration">
+            <Panel title="Financial Statements">
               <div style={{ marginBottom: '16px' }}>
                 <div
                   style={{
@@ -5035,46 +5158,48 @@ export default function IgeaOmnisPro() {
                     marginBottom: '8px',
                   }}
                 >
-                  SELECT ASSETS
+                  COMPANY TICKER
                 </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                  {[
-                    ...Object.keys(STOCKS),
-                    ...Object.keys(INDICES).slice(0, 4),
-                  ].map((t) => (
-                    <button
-                      key={t}
-                      onClick={() =>
-                        setReportAssets(
-                          reportAssets.includes(t)
-                            ? reportAssets.filter((x) => x !== t)
-                            : [...reportAssets, t]
-                        )
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="e.g., AAPL"
+                    value={compareInput}
+                    onChange={(e) => setCompareInput(e.target.value.toUpperCase())}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && compareInput.trim()) {
+                        getFinancialStatements(compareInput.trim());
                       }
-                      style={{
-                        padding: '4px 10px',
-                        border: `1px solid ${
-                          reportAssets.includes(t)
-                            ? COLORS.primary
-                            : COLORS.border
-                        }`,
-                        background: reportAssets.includes(t)
-                          ? `${COLORS.primary}15`
-                          : 'transparent',
-                        borderRadius: '4px',
-                        fontSize: '10px',
-                        fontWeight: 600,
-                        color: reportAssets.includes(t)
-                          ? COLORS.primary
-                          : COLORS.textTertiary,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {t}
-                    </button>
-                  ))}
+                    }}
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      border: `1px solid ${COLORS.border}`,
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      fontFamily: 'inherit',
+                    }}
+                  />
+                  <button
+                    onClick={() => compareInput.trim() && getFinancialStatements(compareInput.trim())}
+                    disabled={isLoading}
+                    style={{
+                      padding: '8px 16px',
+                      background: COLORS.primary,
+                      color: COLORS.textInverse,
+                      border: 'none',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      cursor: isLoading ? 'not-allowed' : 'pointer',
+                      opacity: isLoading ? 0.6 : 1,
+                    }}
+                  >
+                    {isLoading ? 'Loading...' : 'Load'}
+                  </button>
                 </div>
               </div>
+
               <div style={{ marginBottom: '16px' }}>
                 <div
                   style={{
@@ -5084,41 +5209,46 @@ export default function IgeaOmnisPro() {
                     marginBottom: '8px',
                   }}
                 >
-                  REPORT TYPE
+                  SELECT DATA ROWS
                 </div>
-                {[
-                  'Market Overview',
-                  'Company Analysis',
-                  'Comparison Report',
-                  'Full M&A Report',
-                ].map((t) => (
-                  <div
-                    key={t}
-                    onClick={() => setReportType(t)}
+                {Object.entries({
+                  revenue: 'Revenue',
+                  netIncome: 'Net Income',
+                  ebitda: 'EBITDA',
+                  totalDebt: 'Total Debt',
+                  totalAssets: 'Total Assets',
+                  operatingCashFlow: 'Operating Cash Flow',
+                }).map(([key, label]) => (
+                  <label
+                    key={key}
                     style={{
-                      padding: '8px 12px',
-                      border: `1px solid ${reportType === t ? COLORS.primary : COLORS.border}`,
-                      background: reportType === t ? `${COLORS.primary}10` : 'transparent',
-                      marginBottom: '4px',
-                      borderRadius: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '6px 0',
                       cursor: 'pointer',
                       fontSize: '11px',
-                      color: reportType === t ? COLORS.primary : COLORS.textPrimary,
-                      fontWeight: reportType === t ? 600 : 400,
                     }}
-                    onMouseEnter={(e) =>
-                      reportType !== t && (e.currentTarget.style.background = COLORS.bgSecondary)
-                    }
-                    onMouseLeave={(e) =>
-                      reportType !== t && (e.currentTarget.style.background = 'transparent')
-                    }
                   >
-                    {t}
-                  </div>
+                    <input
+                      type="checkbox"
+                      checked={selectedFinancialRows[key]}
+                      onChange={(e) =>
+                        setSelectedFinancialRows({
+                          ...selectedFinancialRows,
+                          [key]: e.target.checked,
+                        })
+                      }
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span>{label}</span>
+                  </label>
                 ))}
               </div>
+
               <button
-                onClick={generateExcelReport}
+                onClick={exportFinancialData}
+                disabled={financialStatements.incomeStatement.length === 0}
                 style={{
                   width: '100%',
                   padding: '12px',
@@ -5128,33 +5258,196 @@ export default function IgeaOmnisPro() {
                   borderRadius: '4px',
                   fontSize: '12px',
                   fontWeight: 700,
-                  cursor: 'pointer',
+                  cursor: financialStatements.incomeStatement.length === 0 ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
+                  opacity: financialStatements.incomeStatement.length === 0 ? 0.5 : 1,
                 }}
               >
-                <Download size={16} /> GENERATE EXCEL REPORT
+                <Download size={16} /> EXPORT TO CSV
               </button>
             </Panel>
-            <Panel title="Report Preview — Selected Assets">
-              <div
-                style={{
-                  fontSize: '8px',
-                  color: COLORS.textMuted,
-                  padding: '6px 0',
-                  display: 'grid',
-                  gridTemplateColumns: '60px 1fr repeat(6, 70px)',
-                  gap: '4px',
-                  borderBottom: `1px solid ${COLORS.border}`,
-                }}
-              >
-                <span>TICKER</span>
-                <span>NAME</span>
-                <span style={{ textAlign: 'right' }}>PRICE</span>
-                <span style={{ textAlign: 'right' }}>CHG %</span>
-                <span style={{ textAlign: 'right' }}>MKT CAP</span>
+
+            <Panel title="Financial Data" noPad>
+              {isLoading && (
+                <div style={{ padding: '40px', textAlign: 'center', color: COLORS.textMuted }}>
+                  Loading financial statements...
+                </div>
+              )}
+
+              {apiError && (
+                <div style={{ padding: '20px', textAlign: 'center', color: COLORS.negative }}>
+                  {apiError}
+                </div>
+              )}
+
+              {!isLoading && !apiError && financialStatements.incomeStatement.length === 0 && (
+                <div style={{ padding: '40px', textAlign: 'center', color: COLORS.textMuted }}>
+                  Enter a company ticker and click Load to view financial statements
+                </div>
+              )}
+
+              {!isLoading && financialStatements.incomeStatement.length > 0 && (
+                <div>
+                  {/* Income Statement */}
+                  <div style={{ padding: '12px', background: COLORS.bgSecondary, borderBottom: `1px solid ${COLORS.border}` }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: COLORS.textPrimary }}>
+                      INCOME STATEMENT
+                    </div>
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ background: COLORS.bgTertiary }}>
+                          <th style={{ padding: '8px', textAlign: 'left', position: 'sticky', left: 0, background: COLORS.bgTertiary, borderBottom: `1px solid ${COLORS.border}` }}>
+                            Metric
+                          </th>
+                          {financialStatements.incomeStatement.slice(0, 5).map((stmt, i) => (
+                            <th key={i} style={{ padding: '8px', textAlign: 'right', borderBottom: `1px solid ${COLORS.border}` }}>
+                              {stmt.date}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedFinancialRows.revenue && (
+                          <tr>
+                            <td style={{ padding: '8px', borderBottom: `1px solid ${COLORS.borderLight}`, position: 'sticky', left: 0, background: COLORS.bgPrimary }}>
+                              Revenue
+                            </td>
+                            {financialStatements.incomeStatement.slice(0, 5).map((stmt, i) => (
+                              <td key={i} style={{ padding: '8px', textAlign: 'right', fontFamily: 'Consolas, monospace', borderBottom: `1px solid ${COLORS.borderLight}` }}>
+                                ${(stmt.revenue / 1e9).toFixed(2)}B
+                              </td>
+                            ))}
+                          </tr>
+                        )}
+                        {selectedFinancialRows.netIncome && (
+                          <tr>
+                            <td style={{ padding: '8px', borderBottom: `1px solid ${COLORS.borderLight}`, position: 'sticky', left: 0, background: COLORS.bgPrimary }}>
+                              Net Income
+                            </td>
+                            {financialStatements.incomeStatement.slice(0, 5).map((stmt, i) => (
+                              <td key={i} style={{ padding: '8px', textAlign: 'right', fontFamily: 'Consolas, monospace', borderBottom: `1px solid ${COLORS.borderLight}` }}>
+                                ${(stmt.netIncome / 1e9).toFixed(2)}B
+                              </td>
+                            ))}
+                          </tr>
+                        )}
+                        {selectedFinancialRows.ebitda && (
+                          <tr>
+                            <td style={{ padding: '8px', borderBottom: `1px solid ${COLORS.borderLight}`, position: 'sticky', left: 0, background: COLORS.bgPrimary }}>
+                              EBITDA
+                            </td>
+                            {financialStatements.incomeStatement.slice(0, 5).map((stmt, i) => (
+                              <td key={i} style={{ padding: '8px', textAlign: 'right', fontFamily: 'Consolas, monospace', borderBottom: `1px solid ${COLORS.borderLight}` }}>
+                                ${stmt.ebitda ? (stmt.ebitda / 1e9).toFixed(2) + 'B' : 'N/A'}
+                              </td>
+                            ))}
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Balance Sheet */}
+                  {financialStatements.balanceSheet.length > 0 && (
+                    <>
+                      <div style={{ padding: '12px', background: COLORS.bgSecondary, borderTop: `2px solid ${COLORS.border}`, borderBottom: `1px solid ${COLORS.border}` }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: COLORS.textPrimary }}>
+                          BALANCE SHEET
+                        </div>
+                      </div>
+                      <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr style={{ background: COLORS.bgTertiary }}>
+                              <th style={{ padding: '8px', textAlign: 'left', position: 'sticky', left: 0, background: COLORS.bgTertiary, borderBottom: `1px solid ${COLORS.border}` }}>
+                                Metric
+                              </th>
+                              {financialStatements.balanceSheet.slice(0, 5).map((stmt, i) => (
+                                <th key={i} style={{ padding: '8px', textAlign: 'right', borderBottom: `1px solid ${COLORS.border}` }}>
+                                  {stmt.date}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedFinancialRows.totalAssets && (
+                              <tr>
+                                <td style={{ padding: '8px', borderBottom: `1px solid ${COLORS.borderLight}`, position: 'sticky', left: 0, background: COLORS.bgPrimary }}>
+                                  Total Assets
+                                </td>
+                                {financialStatements.balanceSheet.slice(0, 5).map((stmt, i) => (
+                                  <td key={i} style={{ padding: '8px', textAlign: 'right', fontFamily: 'Consolas, monospace', borderBottom: `1px solid ${COLORS.borderLight}` }}>
+                                    ${(stmt.totalAssets / 1e9).toFixed(2)}B
+                                  </td>
+                                ))}
+                              </tr>
+                            )}
+                            {selectedFinancialRows.totalDebt && (
+                              <tr>
+                                <td style={{ padding: '8px', borderBottom: `1px solid ${COLORS.borderLight}`, position: 'sticky', left: 0, background: COLORS.bgPrimary }}>
+                                  Total Debt
+                                </td>
+                                {financialStatements.balanceSheet.slice(0, 5).map((stmt, i) => (
+                                  <td key={i} style={{ padding: '8px', textAlign: 'right', fontFamily: 'Consolas, monospace', borderBottom: `1px solid ${COLORS.borderLight}` }}>
+                                    ${(stmt.totalDebt / 1e9).toFixed(2)}B
+                                  </td>
+                                ))}
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Cash Flow */}
+                  {financialStatements.cashFlow.length > 0 && selectedFinancialRows.operatingCashFlow && (
+                    <>
+                      <div style={{ padding: '12px', background: COLORS.bgSecondary, borderTop: `2px solid ${COLORS.border}`, borderBottom: `1px solid ${COLORS.border}` }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: COLORS.textPrimary }}>
+                          CASH FLOW STATEMENT
+                        </div>
+                      </div>
+                      <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr style={{ background: COLORS.bgTertiary }}>
+                              <th style={{ padding: '8px', textAlign: 'left', position: 'sticky', left: 0, background: COLORS.bgTertiary, borderBottom: `1px solid ${COLORS.border}` }}>
+                                Metric
+                              </th>
+                              {financialStatements.cashFlow.slice(0, 5).map((stmt, i) => (
+                                <th key={i} style={{ padding: '8px', textAlign: 'right', borderBottom: `1px solid ${COLORS.border}` }}>
+                                  {stmt.date}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td style={{ padding: '8px', borderBottom: `1px solid ${COLORS.borderLight}`, position: 'sticky', left: 0, background: COLORS.bgPrimary }}>
+                                Operating Cash Flow
+                              </td>
+                              {financialStatements.cashFlow.slice(0, 5).map((stmt, i) => (
+                                <td key={i} style={{ padding: '8px', textAlign: 'right', fontFamily: 'Consolas, monospace', borderBottom: `1px solid ${COLORS.borderLight}` }}>
+                                  ${(stmt.operatingCashFlow / 1e9).toFixed(2)}B
+                                </td>
+                              ))}
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </Panel>
+          </div>
+        )}
                 <span style={{ textAlign: 'right' }}>P/E</span>
                 <span style={{ textAlign: 'right' }}>EV/EBITDA</span>
                 <span style={{ textAlign: 'right' }}>ROE %</span>
