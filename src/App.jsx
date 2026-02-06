@@ -3826,100 +3826,24 @@ export default function IgeaOmnisPro() {
                   {showCorrelation ? '✓' : ''} Correlation Matrix
                 </button>
               </Panel>
-              <Panel 
-                title="Period Returns"
-                action={
-                  <button
-                    onClick={downloadCompareData}
-                    style={{
-                      padding: '2px 8px',
-                      border: 'none',
-                      background: COLORS.primary,
-                      color: COLORS.textInverse,
-                      fontSize: '9px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      borderRadius: '3px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
-                  >
-                    <Download size={10} /> CSV
-                  </button>
-                }
-              >
-                            padding: '8px 10px',
-                            cursor: 'pointer',
-                            borderBottom: `1px solid ${COLORS.borderLight}`,
-                            fontSize: '11px',
-                          }}
-                          onMouseEnter={(e) =>
-                            (e.currentTarget.style.background = COLORS.bgSecondary)
-                          }
-                          onMouseLeave={(e) =>
-                            (e.currentTarget.style.background = 'transparent')
-                          }
-                        >
-                          <div style={{ fontWeight: 600, color: COLORS.primary }}>
-                            {ticker}
-                          </div>
-                          <div style={{ fontSize: '9px', color: COLORS.textTertiary }}>
-                            {allAssets[ticker]?.name}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {compareAssets.map((a, i) => (
-                  <div
-                    key={a}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '8px',
-                      background: COLORS.bgSecondary,
-                      marginBottom: '4px',
-                      borderRadius: '4px',
-                      borderLeft: `3px solid ${
-                        chartColors[i % chartColors.length]
-                      }`,
-                    }}
-                  >
-                    <div>
-                      <div
-                        style={{
-                          fontFamily: "'Consolas', monospace",
-                          fontWeight: 700,
-                          fontSize: '12px',
-                          color: COLORS.primary,
-                        }}
-                      >
-                        {a}
-                      </div>
-                      <div
-                        style={{ fontSize: '10px', color: COLORS.textTertiary }}
-                      >
-                        {allAssets[a]?.name}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() =>
-                        setCompareAssets(compareAssets.filter((x) => x !== a))
-                      }
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: COLORS.textMuted,
-                      }}
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                ))}
+              <Panel title="Tools">
+                <button
+                  onClick={() => setShowCorrelation(!showCorrelation)}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    marginBottom: '8px',
+                    border: `1px solid ${COLORS.border}`,
+                    background: showCorrelation ? COLORS.primary : 'transparent',
+                    color: showCorrelation ? COLORS.textInverse : COLORS.textPrimary,
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {showCorrelation ? '✓' : ''} Correlation Matrix
+                </button>
               </Panel>
               <Panel 
                 title="Period Returns"
@@ -5746,158 +5670,6 @@ export default function IgeaOmnisPro() {
                   )}
                 </div>
               )}
-            </Panel>
-          </div>
-        )}
-                <span style={{ textAlign: 'right' }}>P/E</span>
-                <span style={{ textAlign: 'right' }}>EV/EBITDA</span>
-                <span style={{ textAlign: 'right' }}>ROE %</span>
-              </div>
-              {reportAssets.map((t) => {
-                const d = STOCKS[t] || INDICES[t];
-                if (!d) return null;
-                return (
-                  <div
-                    key={t}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '60px 1fr repeat(6, 70px)',
-                      gap: '4px',
-                      padding: '8px 0',
-                      borderBottom: `1px solid ${COLORS.borderLight}`,
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: "'Consolas', monospace",
-                        fontWeight: 700,
-                        fontSize: '11px',
-                        color: COLORS.primary,
-                      }}
-                    >
-                      {t}
-                    </span>
-                    <span
-                      style={{ fontSize: '10px', color: COLORS.textSecondary }}
-                    >
-                      {d.name}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "'Consolas', monospace",
-                        fontSize: '10px',
-                        textAlign: 'right',
-                      }}
-                    >
-                      ${fmt(d.price, 2)}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "'Consolas', monospace",
-                        fontSize: '10px',
-                        textAlign: 'right',
-                        color:
-                          d.change >= 0 ? COLORS.positive : COLORS.negative,
-                      }}
-                    >
-                      {fmtChg(d.change)}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "'Consolas', monospace",
-                        fontSize: '10px',
-                        textAlign: 'right',
-                      }}
-                    >
-                      {d.marketCap ? `$${fmtLargeNum(d.marketCap)}` : '—'}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "'Consolas', monospace",
-                        fontSize: '10px',
-                        textAlign: 'right',
-                      }}
-                    >
-                      {d.pe ? fmt(d.pe, 1) : '—'}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "'Consolas', monospace",
-                        fontSize: '10px',
-                        textAlign: 'right',
-                      }}
-                    >
-                      {d.evEbitda ? fmt(d.evEbitda, 1) : '—'}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "'Consolas', monospace",
-                        fontSize: '10px',
-                        textAlign: 'right',
-                      }}
-                    >
-                      {d.roe ? `${d.roe}%` : '—'}
-                    </span>
-                  </div>
-                );
-              })}
-              <div
-                style={{
-                  marginTop: '16px',
-                  padding: '12px',
-                  background: COLORS.bgSecondary,
-                  borderRadius: '4px',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: '10px',
-                    color: COLORS.textTertiary,
-                    marginBottom: '8px',
-                  }}
-                >
-                  EXPORT OPTIONS
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      border: `1px solid ${COLORS.border}`,
-                      background: COLORS.bgPrimary,
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    <FileText size={14} /> Export CSV
-                  </button>
-                  <button
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      border: 'none',
-                      background: COLORS.positive,
-                      color: COLORS.textInverse,
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    <Download size={14} /> Export Excel
-                  </button>
-                </div>
-              </div>
             </Panel>
           </div>
         )}
