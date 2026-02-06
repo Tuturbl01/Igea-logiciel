@@ -12,17 +12,18 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run server\""
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.5.0",
-    "lucide-react": "^0.263.1",
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
     "yahoo-finance2": "^2.11.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
-    "vite": "^4.5.2",
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "vite": "^4.5.2"
   }
 }
