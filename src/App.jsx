@@ -3374,6 +3374,39 @@ export default function IgeaOmnisPro() {
               title="Custom Comparison — Normalized Performance (Base 100)"
               action={
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button
+                    onClick={() => setShowNormalized(!showNormalized)}
+                    style={{
+                      padding: '2px 8px',
+                      border: `1px solid ${COLORS.border}`,
+                      background: showNormalized ? COLORS.primary : 'transparent',
+                      color: showNormalized ? COLORS.textInverse : COLORS.textMuted,
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      borderRadius: '3px',
+                    }}
+                  >
+                    {showNormalized ? '✓' : ''} Normalize
+                  </button>
+                  <button
+                    onClick={() => exportChartToPNG({ current: document.querySelector('#compare-chart') }, 'comparison_chart')}
+                    style={{
+                      padding: '2px 8px',
+                      border: 'none',
+                      background: COLORS.primary,
+                      color: COLORS.textInverse,
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      borderRadius: '3px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    📸 PNG
+                  </button>
                   <div style={{ display: 'flex', gap: '4px' }}>
                     {['1W', 'WTD', '1M', 'MTD', '3M', '6M', 'YTD', '1Y'].map(
                       (p) => (
@@ -3446,46 +3479,140 @@ export default function IgeaOmnisPro() {
                 </div>
               }
             >
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={compareData}>
-                  <CartesianGrid
-                    strokeDasharray="1 1"
-                    stroke={COLORS.borderLight}
-                  />
-                  <XAxis
-                    dataKey="date"
-                    stroke={COLORS.textMuted}
-                    fontSize={9}
-                    tickLine={false}
-                    interval="preserveStartEnd"
-                  />
-                  <YAxis
-                    stroke={COLORS.textMuted}
-                    fontSize={9}
-                    tickLine={false}
-                    domain={['auto', 'auto']}
-                    tickFormatter={(v) => v.toFixed(0)}
-                    width={40}
-                  />
-                  <ReferenceLine
-                    y={100}
-                    stroke={COLORS.textMuted}
-                    strokeDasharray="3 3"
-                  />
-                  <Tooltip content={<Tooltip2 />} />
-                  <Legend wrapperStyle={{ fontSize: '10px' }} />
-                  {compareAssets.map((a, i) => (
-                    <Line
-                      key={a}
-                      type="monotone"
-                      dataKey={a}
-                      stroke={chartColors[i % chartColors.length]}
-                      strokeWidth={2}
-                      dot={false}
+              <div id="compare-chart">
+                <ResponsiveContainer width="100%" height={400}>
+                  <LineChart data={showNormalized ? compareData : compareData.map((p, i) => {
+                    const denormalized = { date: p.date };
+                    compareAssets.forEach((a) => {
+                      const h = allAssets[a]?.history;
+                      if (h && h[i]) denormalized[a] = h[i].price;
+                    });
+                    return denormalized;
+                  })}>
+                    <CartesianGrid
+                      strokeDasharray="1 1"
+                      stroke={COLORS.borderLight}
                     />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
+                    <XAxis
+                      dataKey="date"
+                      stroke={COLORS.textMuted}
+                      fontSize={9}
+                      tickLine={false}
+                      interval="preserveStartEnd"
+                    />
+                    <YAxis
+                      stroke={COLORS.textMuted}
+                      fontSize={9}
+                      tickLine={false}
+                      domain={['auto', 'auto']}
+                      tickFormatter={(v) => v.toFixed(0)}
+                      width={40}
+                    />
+                    {showNormalized && (
+                      <ReferenceLine
+                        y={100}
+                        stroke={COLORS.textMuted}
+                        strokeDasharray="3 3"
+                      />
+                    )}
+                    <Tooltip content={<Tooltip2 />} />
+                    <Legend wrapperStyle={{ fontSize: '10px' }} />
+                    {compareAssets.map((a, i) => {
+                      const color = assetColors[a] || chartColors[i % chartColors.length];
+                      const firstValue = showNormalized ? 100 : allAssets[a]?.history?.[0]?.price || 0;
+                      const lastValue = showNormalized ? (compareData[compareData.length - 1]?.[a] || 100) : (allAssets[a]?.history?.[allAssets[a].history.length - 1]?.price || 0);
+                      const performance = ((lastValue - firstValue) / firstValue) * 100;
+                      
+                      return (
+                        <Line
+                          key={a}
+                          type="monotone"
+                          dataKey={a}
+                          stroke={color}
+                          strokeWidth={2}
+                          dot={false}
+                          label={({ index, value, x, y }) => {
+                            // Only show label on last data point
+                            if (index === compareData.length - 1) {
+                              return (
+                                <text
+                                  x={x + 10}
+                                  y={y}
+                                  fill={color}
+                                  fontSize={10}
+                                  fontWeight={700}
+                                  fontFamily="Consolas, monospace"
+                                >
+                                  {performance >= 0 ? '+' : ''}{performance.toFixed(1)}%
+                                </text>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                      );
+                    })}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Correlation Matrix */}
+              {showCorrelation && compareAssets.length >= 2 && (
+                <div style={{ marginTop: '20px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, marginBottom: '8px', color: COLORS.textPrimary }}>
+                    Correlation Matrix (Pearson)
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', fontSize: '9px', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr>
+                          <th style={{ padding: '6px', textAlign: 'left', background: COLORS.bgTertiary, borderBottom: `1px solid ${COLORS.border}` }}>
+                            Asset
+                          </th>
+                          {compareAssets.map((a) => (
+                            <th key={a} style={{ padding: '6px', textAlign: 'center', background: COLORS.bgTertiary, borderBottom: `1px solid ${COLORS.border}`, fontFamily: 'Consolas, monospace' }}>
+                              {a}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {calculateCorrelationMatrix(compareAssets).map((row, i) => (
+                          <tr key={row.asset}>
+                            <td style={{ padding: '6px', fontWeight: 700, fontFamily: 'Consolas, monospace', background: COLORS.bgTertiary, borderRight: `1px solid ${COLORS.border}` }}>
+                              {row.asset}
+                            </td>
+                            {compareAssets.map((a, j) => {
+                              const corr = row[a];
+                              const intensity = Math.abs(corr);
+                              const bgColor = corr > 0 
+                                ? `rgba(5, 150, 105, ${intensity * 0.5})` 
+                                : `rgba(220, 38, 38, ${intensity * 0.5})`;
+                              
+                              return (
+                                <td
+                                  key={a}
+                                  style={{
+                                    padding: '6px',
+                                    textAlign: 'center',
+                                    background: i === j ? COLORS.bgTertiary : bgColor,
+                                    fontFamily: 'Consolas, monospace',
+                                    fontWeight: 600,
+                                    color: intensity > 0.5 ? COLORS.textInverse : COLORS.textPrimary,
+                                    borderBottom: `1px solid ${COLORS.borderLight}`,
+                                  }}
+                                >
+                                  {corr.toFixed(2)}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </Panel>
             <div
               style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
@@ -3548,6 +3675,135 @@ export default function IgeaOmnisPro() {
                             setCompareInput('');
                           }}
                           style={{
+                            padding: '8px 10px',
+                            cursor: 'pointer',
+                            borderBottom: `1px solid ${COLORS.borderLight}`,
+                            fontSize: '11px',
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.background = COLORS.bgSecondary)
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.background = 'transparent')
+                          }
+                        >
+                          <div style={{ fontWeight: 600, color: COLORS.primary }}>
+                            {ticker}
+                          </div>
+                          <div style={{ fontSize: '9px', color: COLORS.textTertiary }}>
+                            {allAssets[ticker]?.name}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {compareAssets.map((a, i) => (
+                  <div
+                    key={a}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '8px',
+                      background: COLORS.bgSecondary,
+                      marginBottom: '4px',
+                      borderRadius: '4px',
+                      borderLeft: `3px solid ${
+                        assetColors[a] || chartColors[i % chartColors.length]
+                      }`,
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <div
+                        style={{
+                          fontFamily: "'Consolas', monospace",
+                          fontWeight: 700,
+                          fontSize: '12px',
+                          color: COLORS.primary,
+                        }}
+                      >
+                        {a}
+                      </div>
+                      <div
+                        style={{ fontSize: '10px', color: COLORS.textTertiary }}
+                      >
+                        {allAssets[a]?.name}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                      <input
+                        type="color"
+                        value={assetColors[a] || chartColors[i % chartColors.length]}
+                        onChange={(e) => setAssetColors({ ...assetColors, [a]: e.target.value })}
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                        title="Change color"
+                      />
+                      <button
+                        onClick={() =>
+                          setCompareAssets(compareAssets.filter((x) => x !== a))
+                        }
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: COLORS.textMuted,
+                        }}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </Panel>
+              <Panel title="Tools">
+                <button
+                  onClick={() => setShowCorrelation(!showCorrelation)}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    marginBottom: '8px',
+                    border: `1px solid ${COLORS.border}`,
+                    background: showCorrelation ? COLORS.primary : 'transparent',
+                    color: showCorrelation ? COLORS.textInverse : COLORS.textPrimary,
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {showCorrelation ? '✓' : ''} Correlation Matrix
+                </button>
+              </Panel>
+              <Panel 
+                title="Period Returns"
+                action={
+                  <button
+                    onClick={downloadCompareData}
+                    style={{
+                      padding: '2px 8px',
+                      border: 'none',
+                      background: COLORS.primary,
+                      color: COLORS.textInverse,
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      borderRadius: '3px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <Download size={10} /> CSV
+                  </button>
+                }
+              >
                             padding: '8px 10px',
                             cursor: 'pointer',
                             borderBottom: `1px solid ${COLORS.borderLight}`,
