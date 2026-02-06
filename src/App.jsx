@@ -655,6 +655,51 @@ const CENTRAL_BANKS = {
   },
 };
 
+// Function to extend Central Banks history with future projections
+const extendCentralBanksHistory = (banks) => {
+  const extended = JSON.parse(JSON.stringify(banks)); // Deep clone
+  
+  Object.keys(extended).forEach(code => {
+    const bank = extended[code];
+    const history = bank.history;
+    const lastEntry = history[history.length - 1];
+    const lastDate = new Date(lastEntry.date + '-01');
+    const currentRate = bank.rate;
+    
+    // Generate future projections (next 12 months)
+    for (let i = 1; i <= 12; i++) {
+      const futureDate = new Date(lastDate);
+      futureDate.setMonth(futureDate.getMonth() + i);
+      const dateStr = `${futureDate.getFullYear()}-${String(futureDate.getMonth() + 1).padStart(2, '0')}`;
+      
+      // Calculate projected rate with realistic variation
+      let projectedRate;
+      if (code === 'FED' || code === 'ECB' || code === 'BOE') {
+        // For restrictive banks, project gradual cuts
+        const cutSpeed = 0.25 * (i / 12); // Gradual easing
+        projectedRate = Math.max(2.0, currentRate - cutSpeed + (Math.random() - 0.5) * 0.1);
+      } else if (code === 'BOJ') {
+        // For accommodative banks, project gradual increases
+        const increaseSpeed = 0.15 * (i / 12);
+        projectedRate = Math.min(0.5, currentRate + increaseSpeed + (Math.random() - 0.5) * 0.05);
+      } else {
+        // For neutral banks, slight variations
+        projectedRate = currentRate + (Math.random() - 0.5) * 0.2;
+      }
+      
+      history.push({
+        date: dateStr,
+        rate: Math.round(projectedRate * 100) / 100,
+      });
+    }
+  });
+  
+  return extended;
+};
+
+// Extended Central Banks with future projections
+const CENTRAL_BANKS_EXTENDED = extendCentralBanksHistory(CENTRAL_BANKS);
+
 // Crypto - Initial Values
 const INITIAL_CRYPTO = {
   BTCUSD: {
@@ -4544,7 +4589,7 @@ export default function IgeaOmnisPro() {
                 <span style={{ textAlign: 'right' }}>CHG</span>
                 <span style={{ textAlign: 'right' }}>STANCE</span>
               </div>
-              {Object.entries(CENTRAL_BANKS).map(([code, bank]) => (
+              {Object.entries(CENTRAL_BANKS_EXTENDED).map(([code, bank]) => (
                 <div
                   key={code}
                   style={{
@@ -4639,7 +4684,7 @@ export default function IgeaOmnisPro() {
                   <span style={{ textAlign: 'right' }}>UNEMP</span>
                   <span style={{ textAlign: 'right' }}>GDP</span>
                 </div>
-                {Object.entries(CENTRAL_BANKS).map(([code, bank]) => (
+                {Object.entries(CENTRAL_BANKS_EXTENDED).map(([code, bank]) => (
                   <div
                     key={code}
                     style={{
@@ -4697,7 +4742,7 @@ export default function IgeaOmnisPro() {
               
               <Panel title="Upcoming Meetings">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {Object.entries(CENTRAL_BANKS)
+                  {Object.entries(CENTRAL_BANKS_EXTENDED)
                     .sort(([, a], [, b]) => new Date(a.nextMeeting) - new Date(b.nextMeeting))
                     .slice(0, 5)
                     .map(([code, bank]) => (
@@ -4749,9 +4794,9 @@ export default function IgeaOmnisPro() {
           
           {/* Historical Interest Rates Chart */}
           <div style={{ marginTop: '12px' }}>
-            <Panel title={`${selectedCentralBank} — ${CENTRAL_BANKS[selectedCentralBank]?.name} — Historical Interest Rates`}>
+            <Panel title={`${selectedCentralBank} — ${CENTRAL_BANKS_EXTENDED[selectedCentralBank]?.name} — Historical Interest Rates`}>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={CENTRAL_BANKS[selectedCentralBank]?.history || []}>
+                <LineChart data={CENTRAL_BANKS_EXTENDED[selectedCentralBank]?.history || []}>
                   <CartesianGrid strokeDasharray="1 1" stroke={COLORS.borderLight} />
                   <XAxis
                     dataKey="date"
@@ -4776,11 +4821,11 @@ export default function IgeaOmnisPro() {
                     name="Interest Rate (%)"
                   />
                   <ReferenceLine
-                    y={CENTRAL_BANKS[selectedCentralBank]?.rate}
+                    y={CENTRAL_BANKS_EXTENDED[selectedCentralBank]?.rate}
                     stroke={COLORS.primary}
                     strokeDasharray="3 3"
                     label={{ 
-                      value: `Current: ${CENTRAL_BANKS[selectedCentralBank]?.rate.toFixed(2)}%`, 
+                      value: `Current: ${CENTRAL_BANKS_EXTENDED[selectedCentralBank]?.rate.toFixed(2)}%`, 
                       position: 'right',
                       fill: COLORS.primary,
                       fontSize: 10,
