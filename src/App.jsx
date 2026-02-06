@@ -1758,7 +1758,7 @@ export default function IgeaOmnisPro() {
   // Advanced chart options
   const [showFinalValue, setShowFinalValue] = useState(true);
   const [showMinMax, setShowMinMax] = useState(false);
-  const [showBenchmark, setShowBenchmark] = useState(false);
+  const [showRiskAnalysis, setShowRiskAnalysis] = useState(false);
 
   // ============================================================================
   // DYNAMIC MARKET DATA STATE
@@ -4174,26 +4174,26 @@ export default function IgeaOmnisPro() {
                 </button>
                 
                 <button
-                  onClick={() => setShowBenchmark(!showBenchmark)}
+                  onClick={() => setShowRiskAnalysis(!showRiskAnalysis)}
                   style={{
                     width: '100%',
                     padding: '8px',
                     border: `1px solid ${COLORS.border}`,
-                    background: showBenchmark ? COLORS.primary : 'transparent',
-                    color: showBenchmark ? COLORS.textInverse : COLORS.textPrimary,
+                    background: showRiskAnalysis ? COLORS.primary : 'transparent',
+                    color: showRiskAnalysis ? COLORS.textInverse : COLORS.textPrimary,
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
-                  {showBenchmark ? '✓' : ''} Benchmark Analysis
+                  {showRiskAnalysis ? '✓' : ''} Risk Analysis
                 </button>
               </Panel>
               
-              {/* Benchmark Analysis Panel */}
-              {showBenchmark && compareAssets.length > 0 && (
-                <Panel title="Benchmark Analysis (vs SPX)">
+              {/* Risk Analysis Panel */}
+              {showRiskAnalysis && compareAssets.length > 0 && (
+                <Panel title="Risk Analysis (vs SPX)">
                   {compareAssets.map((ticker) => {
                     const metrics = calculateBenchmarkMetrics(ticker, 'SPX');
                     if (!metrics) return null;
